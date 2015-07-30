@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="hello">Jasper hello</string>
+    <string name="app_name">NumberGame</string>
+	<string name="Go">GO</string>
+	<string name="Reset">RESET</string>
+	<string name="text1">1</string>
+	<string name="text2">2</string>
+	<string name="text3">3</string>
+	<string name="text4">4</string>
+	<!-- number Button -->
+	<string name="One">1</string>
+	<string name="Two">2</string>
+	<string name="Three">3</string>
+	<string name="Four">4</string>
+	<string name="Five">5</string>
+	<string name="Six">6</string>
+	<string name="Seven">7</string>
+	<string name="Eight">8</string>
+	<string name="Nine">9</string>
+
+</resources>
