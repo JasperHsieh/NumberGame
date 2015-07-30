@@ -28,7 +28,7 @@ public class HelloWorldActivity extends Activity {
 	private Button eight_btn;
 	private Button nine_btn;
 	
-	private int focusNumber;
+	private int focusColumn;
 	
 
 
@@ -38,7 +38,7 @@ public class HelloWorldActivity extends Activity {
         
         setContentView(R.layout.main);
 		setView();
-		focusNumber = 1;
+		focusColumn = 1;
 		
     }
 
@@ -84,7 +84,7 @@ public class HelloWorldActivity extends Activity {
 		@Override
 		public void onClick(View view){
 			
-			unfocus(focusNumber);
+			unfocus(focusColumn);
 			switch(view.getId()){
 				
 				case R.id.number1:
@@ -118,6 +118,7 @@ public class HelloWorldActivity extends Activity {
 				case R.id.reset:
 					break;
 				case R.id.one:
+					setNumber(1);
 					break;
 				case R.id.two:
 					break;
@@ -139,37 +140,41 @@ public class HelloWorldActivity extends Activity {
 		}
 	};
 
-	private void focus(int number){
+	private void setNumber(int n){
 		
-		if(focusNumber == number)return;
+	}
+
+	private void focus(int column){
 		
-		switch(number){
+		if(focusColumn == column)return;
+		
+		switch(column){
 			
 			case 1:
 				number_1.setBackgroundResource(R.drawable.border);
-				focusNumber = 1;
+				focusColumn = 1;
 				break;
 			case 2:
 				number_2.setBackgroundResource(R.drawable.border);
-				focusNumber = 2;
+				focusColumn = 2;
 				break;
 			case 3:
 				number_3.setBackgroundResource(R.drawable.border);
-				focusNumber = 3;
+				focusColumn = 3;
 				break;
 			case 4:
 				number_4.setBackgroundResource(R.drawable.border);
-				focusNumber = 4;
+				focusColumn = 4;
 				break;
 		}
 		
 
 	}
 
-	private void unfocus(int number){
+	private void unfocus(int column){
 		
-		if(focusNumber != number)return;
-		switch(number){
+		if(focusColumn != column)return;
+		switch(column){
 			
 			case 1:
 				number_1.setBackgroundResource(0);
