@@ -53,33 +53,37 @@ public class HelloWorldActivity extends Activity {
 		reset_btn = (Button)findViewById(R.id.reset);
 
 		one_btn = (Button)findViewById(R.id.one);
-		two_btn = (Button)findViewById(R.id.one);
-		three_btn = (Button)findViewById(R.id.one);
-		four_btn = (Button)findViewById(R.id.one);
-		five_btn = (Button)findViewById(R.id.one);
-		six_btn = (Button)findViewById(R.id.one);
-		seven_btn = (Button)findViewById(R.id.one);
-		eight_btn = (Button)findViewById(R.id.one);
-		nine_btn = (Button)findViewById(R.id.one);
+		two_btn = (Button)findViewById(R.id.two);
+		three_btn = (Button)findViewById(R.id.three);
+		four_btn = (Button)findViewById(R.id.four);
+		five_btn = (Button)findViewById(R.id.five);
+		six_btn = (Button)findViewById(R.id.six);
+		seven_btn = (Button)findViewById(R.id.seven);
+		eight_btn = (Button)findViewById(R.id.eight);
+		nine_btn = (Button)findViewById(R.id.nine);
 
-		number_1.setOnClickListener(mNumberListener);
-		number_2.setOnClickListener(mNumberListener);
-		number_3.setOnClickListener(mNumberListener);
-		number_4.setOnClickListener(mNumberListener);
-		ok_btn.setOnClickListener(mListener);
-		reset_btn.setOnClickListener(mListener);
-		one_btn.setOnClickListener(mListener);
-		two_btn.setOnClickListener(mListener);
-		three_btn.setOnClickListener(mListener);
-		four_btn.setOnClickListener(mListener);
-		five_btn.setOnClickListener(mListener);
-		six_btn.setOnClickListener(mListener);
-		seven_btn.setOnClickListener(mListener);
-		eight_btn.setOnClickListener(mListener);
-		nine_btn.setOnClickListener(mListener);
+		number_1.setOnClickListener(mColumnListener);
+		number_2.setOnClickListener(mColumnListener);
+		number_3.setOnClickListener(mColumnListener);
+		number_4.setOnClickListener(mColumnListener);
+
+		ok_btn.setOnClickListener(mNumberListener);
+		reset_btn.setOnClickListener(mNumberListener);
+
+		one_btn.setOnClickListener(mNumberListener);
+		two_btn.setOnClickListener(mNumberListener);
+		three_btn.setOnClickListener(mNumberListener);
+		four_btn.setOnClickListener(mNumberListener);
+		five_btn.setOnClickListener(mNumberListener);
+		six_btn.setOnClickListener(mNumberListener);
+		seven_btn.setOnClickListener(mNumberListener);
+		eight_btn.setOnClickListener(mNumberListener);
+		nine_btn.setOnClickListener(mNumberListener);
 	}
 
-	private OnClickListener mNumberListener = new OnClickListener(){
+
+
+	private OnClickListener mColumnListener = new OnClickListener(){
 		
 		@Override
 		public void onClick(View view){
@@ -107,87 +111,95 @@ public class HelloWorldActivity extends Activity {
 		}
 	};
 
-	private OnClickListener mListener = new OnClickListener(){
+	private OnClickListener mNumberListener = new OnClickListener(){
 		
 		@Override
 		public void onClick(View view){
 			
 			switch(view.getId()){
-				case R.id.go:				
-					break;
-				case R.id.reset:
-					break;
 				case R.id.one:
 					setNumber(1);
 					break;
 				case R.id.two:
+					setNumber(2);
 					break;
 				case R.id.three:
+					setNumber(3);
 					break;
 				case R.id.four:
+					setNumber(4);
 					break;
 				case R.id.five:
+					setNumber(5);
 					break;
 				case R.id.six:
+					setNumber(6);
 					break;
 				case R.id.seven:
+					setNumber(7);
 					break;
 				case R.id.eight:
+					setNumber(8);
 					break;
 				case R.id.nine:
+					setNumber(9);
 					break;
 			}
+			focusNext();
 		}
 	};
 
-	private void setNumber(int n){
+	private void focusNext(){
 		
+		Log.d(TAG, "jasper focusNext");
+		if(focusColumn == 4)return;
+
+		unfocus(focusColumn);
+		focus(++focusColumn);
 	}
 
-	private void focus(int column){
+	private void setNumber(int number){
 		
-		if(focusColumn == column)return;
+		Log.d(TAG, "jasper f:" + focusColumn + " n:" + number);
+		String s = "" + number;
+		getFocusColumn(focusColumn).setText(s);
+	}
+	
+	private TextView getFocusColumn(int column){
 		
 		switch(column){
 			
 			case 1:
-				number_1.setBackgroundResource(R.drawable.border);
-				focusColumn = 1;
-				break;
+				return number_1;
 			case 2:
-				number_2.setBackgroundResource(R.drawable.border);
-				focusColumn = 2;
-				break;
+				return number_2;
 			case 3:
-				number_3.setBackgroundResource(R.drawable.border);
-				focusColumn = 3;
-				break;
+				return number_3;
 			case 4:
-				number_4.setBackgroundResource(R.drawable.border);
-				focusColumn = 4;
-				break;
+				return number_4;
+			default:
+				Log.d(TAG, "jasper wrong column number");
+				return null;
 		}
+	}
+
+	private void focus(int column){
 		
+		
+		if(getFocusColumn(column) != null){
+			getFocusColumn(column).setBackgroundResource(R.drawable.border);
+		}
+		focusColumn = column;
+
 
 	}
 
 	private void unfocus(int column){
 		
 		if(focusColumn != column)return;
-		switch(column){
-			
-			case 1:
-				number_1.setBackgroundResource(0);
-				break;
-			case 2:
-				number_2.setBackgroundResource(0);
-				break;
-			case 3:
-				number_3.setBackgroundResource(0);
-				break;
-			case 4:
-				number_4.setBackgroundResource(0);
-				break;
+		
+		if(getFocusColumn(column) != null){
+			getFocusColumn(column).setBackgroundResource(0);
 		}
 	}
 
