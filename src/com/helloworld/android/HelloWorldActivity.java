@@ -8,6 +8,10 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.util.Log;
+
+import java.util.*;
+import java.lang.Character;
+
 public class HelloWorldActivity extends Activity {
    	
 	private final String TAG = "HelloWorldActivity";
@@ -29,20 +33,48 @@ public class HelloWorldActivity extends Activity {
 	private Button nine_btn;
 	
 	private int focusColumn;
-	
+	private String targetNumber;
+	private ArrayList<Number> currentList;
+
+	// number object to store number and match level
+	// 0: no match anything
+	// 1: match number only
+	// 2: match nunmber and postion
+	public class Number{
+		char no;
+		int match = 0;
+	}
+
+	public class Result{
+		String result_number;
+		String result_hint;
+	}
 
 
    	@Override
 	public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
+		// set layout and get view
         setContentView(R.layout.main);
-		setView();
+		setMyView();
+
+		// set default focus column to be the first one
 		focusColumn = 1;
 		
-    }
+		// initial arraylist size=4
+		currentList = new ArrayList<Number>();
+		for(int i=0; i<4; i++){
+			Number tmpNumber = new Number();
+			currentList.add(tmpNumber);
+		}
 
-	private void setView(){
+		resetTargetNumber();
+	}
+
+
+
+	private void setMyView(){
 	
 		number_1 = (TextView)findViewById(R.id.number1);
 		number_2 = (TextView)findViewById(R.id.number2);
@@ -67,8 +99,8 @@ public class HelloWorldActivity extends Activity {
 		number_3.setOnClickListener(mColumnListener);
 		number_4.setOnClickListener(mColumnListener);
 
-		ok_btn.setOnClickListener(mNumberListener);
-		reset_btn.setOnClickListener(mNumberListener);
+		ok_btn.setOnClickListener(mListener);
+		reset_btn.setOnClickListener(mListener);
 
 		one_btn.setOnClickListener(mNumberListener);
 		two_btn.setOnClickListener(mNumberListener);
@@ -81,7 +113,22 @@ public class HelloWorldActivity extends Activity {
 		nine_btn.setOnClickListener(mNumberListener);
 	}
 
+	private OnClickListener mListener = new OnClickListener(){
 
+		@Override
+		public void onClick(View view){
+
+			switch(view.getId()){
+
+				case R.id.go:
+					startGame();
+					break;
+				case R.id.reset:
+					resetTargetNumber();
+					break;
+			}
+		}
+	};
 
 	private OnClickListener mColumnListener = new OnClickListener(){
 		
@@ -148,6 +195,91 @@ public class HelloWorldActivity extends Activity {
 			focusNext();
 		}
 	};
+
+	private void startGame(){
+
+		setCurrentNumber();
+		getCurrentNumber();
+		startCompare();
+
+	}
+
+	private void startCompare(){
+		// reset current number list match flag
+		for(int i=0; i<4; i++){
+			currentList.get(i).match = 0;
+		}
+
+		// initial target number set
+		Set<Character> mTargetNumbersSet = new HashSet();
+		for(int i=0; i<4; i++){
+			mTargetNumbersSet.add(targetNumber.charAt(i));
+		}
+		for(char c:mTargetNumbersSet){
+			//Log.d(TAG, "jasper mTargetNumbersSet:" + c);
+		}
+
+		// start to compare
+		for(int i=0; i<4; i++){
+
+			if(currentList.get(i).no == targetNumber.charAt(i)){
+				// match number and posistion
+				currentList.get(i).match = 2;
+			}
+			else if(mTargetNumbersSet.contains(currentList.get(i).no)){
+				// match number only
+				currentList.get(i).match = 1;
+			}
+
+		}
+
+		for(int i=0; i<4; i++){
+			Log.d(TAG, "jasper " + currentList.get(i).no + ":" + currentList.get(i).match);
+		}
+
+	}
+
+	// can optimize
+	private void resetTargetNumber(){
+
+		targetNumber = "";
+		Set<String> mNumbers = new HashSet();
+		Random rn = new Random();
+		String tmp = String.valueOf(rn.nextInt(9) + 1);
+		mNumbers.add(tmp);
+		//Log.d(TAG, "jasper tmp:" + tmp);
+		while(mNumbers.size() < 4){
+
+			tmp = String.valueOf(rn.nextInt(9) + 1);
+			if(!mNumbers.contains(tmp)){
+				mNumbers.add(tmp);
+				//Log.d(TAG, "jasper tmp:" + tmp);
+			}
+		}
+
+		for(String s: mNumbers){
+			targetNumber = targetNumber + s;
+		}
+		Log.d(TAG, "jasper targetNumber:" + targetNumber);
+	}
+
+	private void setCurrentNumber(){
+
+		for(int i=0; i<4; i++){
+
+			//Log.d(TAG,"jasper add:" + getFocusColumn(i+1).getText().toString());
+			currentList.get(i).no = getFocusColumn(i+1).getText().toString().charAt(0);
+		}
+	}
+
+	private void getCurrentNumber(){
+
+		Log.d(TAG, "jasper currentList:"
+			+ currentList.get(0).no
+			+ currentList.get(1).no
+			+ currentList.get(2).no
+			+ currentList.get(3).no);
+	}
 
 	private void focusNext(){
 		
