@@ -3,11 +3,17 @@ package com.numbergame.android;
 import android.app.Activity;
 import android.os.Bundle;
 import android.widget.TextView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.BaseAdapter;
 import android.view.WindowManager;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.view.LayoutInflater;
 import android.widget.Button;
 import android.util.Log;
+import android.content.Context;
 
 import java.util.*;
 import java.lang.Character;
@@ -31,10 +37,13 @@ public class HelloWorldActivity extends Activity {
 	private Button seven_btn;
 	private Button eight_btn;
 	private Button nine_btn;
-	
+	private ListView resultList;
+
+
 	private int focusColumn;
 	private String targetNumber;
 	private ArrayList<Number> currentList;
+	private ArrayList<String> displayList;
 
 	// number object to store number and match level
 	// 0: no match anything
@@ -50,11 +59,34 @@ public class HelloWorldActivity extends Activity {
 		String result_hint;
 	}
 
+	public class ResultAdapter extends ArrayAdapter<String>{
+
+		public ResultAdapter(Context context, ArrayList<String> testResults){
+			super(context, 0, testResults);
+		}
+
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent){
+
+			String test_result = getItem(position);
+
+			if(convertView == null){
+				convertView = LayoutInflater.from(getContext()).inflate(R.layout.list_result, parent, false);
+			}
+
+			TextView tv = (TextView) convertView.findViewById(R.id.display_result);
+			tv.setText(test_result);
+
+			return convertView;
+		}
+
+	}
 
    	@Override
 	public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
+		Log.d(TAG, "jasper onCreate");
 		// set layout and get view
         setContentView(R.layout.main);
 		setMyView();
@@ -70,6 +102,7 @@ public class HelloWorldActivity extends Activity {
 		}
 
 		resetTargetNumber();
+		displayList = new ArrayList<String>();
 	}
 
 
@@ -93,6 +126,8 @@ public class HelloWorldActivity extends Activity {
 		seven_btn = (Button)findViewById(R.id.seven);
 		eight_btn = (Button)findViewById(R.id.eight);
 		nine_btn = (Button)findViewById(R.id.nine);
+
+		resultList = (ListView)findViewById(R.id.result_list);
 
 		number_1.setOnClickListener(mColumnListener);
 		number_2.setOnClickListener(mColumnListener);
@@ -125,6 +160,7 @@ public class HelloWorldActivity extends Activity {
 					break;
 				case R.id.reset:
 					resetTargetNumber();
+					cleanup();
 					break;
 			}
 		}
@@ -201,10 +237,62 @@ public class HelloWorldActivity extends Activity {
 		setCurrentNumber();
 		getCurrentNumber();
 		startCompare();
+		String compareResult = getCompareResult();
+
+		Log.d(TAG, "jasper " + compareResult);
+
+		String currentResult = "";
+		for(int i=0; i<4; i++){
+			currentResult = currentResult + currentList.get(i).no;
+		}
+
+		currentResult = currentResult + "    " + compareResult;
+		displayList.add(currentResult);
+		/*
+		ArrayAdapter mArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, displayList);
+		resultList.setAdapter(mArrayAdapter);
+
+		resultList.setSelection(resultList.getAdapter().getCount()-1);
+		*/
+		setListView();
 
 	}
 
+	private void setListView(){
+
+		ResultAdapter mAdapter = new ResultAdapter(this, displayList);
+		resultList.setAdapter(mAdapter);
+		resultList.setSelection(resultList.getAdapter().getCount()-1);
+	}
+
+	private void cleanup(){
+
+		displayList.clear();
+		((BaseAdapter)resultList.getAdapter()).notifyDataSetChanged();
+	}
+
+	private String getCompareResult(){
+
+		int A_number = 0;
+		int B_number = 0;
+
+		for(int i=0; i<4; i++){
+
+			if(currentList.get(i).match == 1){
+
+				B_number++;
+			}
+			else if(currentList.get(i).match == 2){
+
+				A_number++;
+			}
+		}
+
+		return "" + A_number + "A" + B_number + "B";
+	}
+
 	private void startCompare(){
+
 		// reset current number list match flag
 		for(int i=0; i<4; i++){
 			currentList.get(i).match = 0;
