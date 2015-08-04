@@ -65,6 +65,11 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:text="@string/Reset"/>
+		<Button
+			android:id="@+id/reset"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="@string/Reset"/>
 	
 	</LinearLayout>
 
@@ -84,74 +89,58 @@
 	<LinearLayout
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:orientation="vertical"
-		android:layout_gravity="center_horizontal">
+		android:orientation="horizontal"
+		android:layout_gravity="center_horizontal"
+		android:layout_marginBottom="30dp">
 		
-		<LinearLayout
+		<Button
+			android:id="@+id/one"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:orientation="horizontal"
-			android:layout_gravity="center_horizontal"
-			android:layout_marginBottom="30dp">
-
-			<Button
-				android:id="@+id/one"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:text="@string/One"/>
-			<Button
-				android:id="@+id/two"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:text="@string/Two"/>
-			<Button
-				android:id="@+id/three"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:text="@string/Three"/>
-			<Button
-				android:id="@+id/four"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:text="@string/Four"/>
-
-		</LinearLayout>
-
-		<LinearLayout
+			android:text="@string/One"/>
+		<Button
+			android:id="@+id/two"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:orientation="horizontal"
-			android:layout_gravity="center_horizontal"
-			android:layout_marginBottom="30dp">
-
-			<Button
-				android:id="@+id/five"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:text="@string/Five"/>
-			<Button
-				android:id="@+id/six"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:text="@string/Six"/>
-			<Button
-				android:id="@+id/seven"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:text="@string/Seven"/>
-			<Button
-				android:id="@+id/eight"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:text="@string/Eight"/>
-			<Button
-				android:id="@+id/nine"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:text="@string/Nine"/>
-		</LinearLayout>
+			android:text="@string/Two"/>
+		<Button
+			android:id="@+id/three"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="@string/Three"/>
+		<Button
+			android:id="@+id/four"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="@string/Four"/>
+		<Button
+			android:id="@+id/five"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="@string/Five"/>
+		<Button
+			android:id="@+id/six"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="@string/Six"/>
+		<Button
+			android:id="@+id/seven"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="@string/Seven"/>
+		<Button
+			android:id="@+id/eight"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="@string/Eight"/>
+		<Button
+			android:id="@+id/nine"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="@string/Nine"/>
 
 	</LinearLayout>
+	
 	
 
 
