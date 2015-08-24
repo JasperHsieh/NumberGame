@@ -273,12 +273,12 @@ public class FightModeGame extends Activity {
 
 	}
 
-	private class FetchRivalTask extends AsyncTask<String, Void, String>{
+	private class FetchRivalTask extends AsyncTask<String, Void, Boolean>{
 
 		private String postURL = "";
 		private String pollingURL = "";
 
-		protected String doInBackground(String... urls){
+		protected Boolean doInBackground(String... urls){
 
 			try{
 				//return checkPin(url[0]);
@@ -291,25 +291,25 @@ public class FightModeGame extends Activity {
 			}
 			catch(IOException e){
 				Log.d(TAG, "jasper unable to retrieve the URL :" + e);
-				return "false";
+				return false;
 			}
-			return "false";
+			return false;
 		}
 
-		protected void onPostExecute(String isFetch){
+		protected void onPostExecute(Boolean isFetch){
 
 			Log.d(TAG, "jasper fetched the rival!!!");
 		}
 	}
 
-	private String postID(String url) throws IOException{
+	private Boolean postID(String url) throws IOException{
 
-		return "false";
+		return false;
 	}
 
-	private String checkFetched(String url) throws IOException{
+	private Boolean checkFetched(String url) throws IOException{
 
-		return "false";
+		return false;
 	}
 
 
