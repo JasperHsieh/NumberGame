@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.os.Bundle;
+import android.os.AsyncTask;
 import android.widget.TextView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -19,8 +20,12 @@ import android.widget.Button;
 import android.util.Log;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+
 import java.util.*;
 import java.lang.Character;
+import java.io.IOException;
 
 public class FightModeGame extends Activity {
    	
@@ -193,9 +198,9 @@ public class FightModeGame extends Activity {
 		displayList = new ArrayList<String>();
 		
 		myPin = "1234";
-		getDialog().show();
+		prepareStartGame();
+		//getMatchDialog().show();
 	}
-
 
 
 	private void setMyView(){
@@ -241,6 +246,12 @@ public class FightModeGame extends Activity {
 		pin_code_edit = (EditText) findViewById(R.id.pin_code);
 	}
 
+	private void prepareStartGame(){
+
+		getMatchDialog().show();
+
+
+	}
 
 	private void startGame(){
 
@@ -262,20 +273,83 @@ public class FightModeGame extends Activity {
 
 	}
 
-	private Dialog getDialog(){
+	private class FetchRivalTask extends AsyncTask<String, Void, String>{
+
+		private String postURL = "";
+		private String pollingURL = "";
+
+		protected String doInBackground(String... urls){
+
+			try{
+				//return checkPin(url[0]);
+				if(postURL.equals(urls[0])){
+					return postID(urls[0]);
+				}
+				else if(pollingURL.equals(urls[0])){
+					return checkFetched(urls[0]);
+				}
+			}
+			catch(IOException e){
+				Log.d(TAG, "jasper unable to retrieve the URL :" + e);
+				return "false";
+			}
+			return "false";
+		}
+
+		protected void onPostExecute(String isFetch){
+
+			Log.d(TAG, "jasper fetched the rival!!!");
+		}
+	}
+
+	private String postID(String url) throws IOException{
+
+		return "false";
+	}
+
+	private String checkFetched(String url) throws IOException{
+
+		return "false";
+	}
+
+
+	private AlertDialog getCheckNetworkDialog(){
 		
-		Log.d(TAG, "jasper getDialog");
+		Log.d(TAG, "jasper getCheckNetworkDialog");
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle(R.string.NoNetworkTitle)
+				.setMessage(R.string.NoNetworkMsg)
+				.setPositiveButton(R.string.signin, new DialogInterface.OnClickListener(){
+
+					@Override
+					public void onClick(DialogInterface dialog, int id){
+
+						Log.d(TAG, "jasper no network click");
+						finish();
+					}
+				});
+		return builder.create();
+	}
+
+	private Dialog getMatchDialog(){
+		
+		Log.d(TAG, "jasper getMatchDialog");
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		LayoutInflater inflater = this.getLayoutInflater();
-		
-		builder.setView(inflater.inflate(R.layout.pairdialog, null))
+		View v = inflater.inflate(R.layout.pairdialog, null);
+		pin_code_edit = (EditText) v.findViewById(R.id.pin_code);
+
+		builder.setView(v)
 			   .setPositiveButton(R.string.signin, new DialogInterface.OnClickListener() {
 			       
 					@Override
 				   	public void onClick(DialogInterface dialog, int id){
 				   		
-						Log.d(TAG, "jasper dialog click");
+						Log.d(TAG, "jasper rival ID dialog click");
 						String rivalPin = pin_code_edit.getText().toString();
+						if(pin_code_edit == null){
+							Log.d(TAG, "jasper input is null");
+						}
 						findOpponent(rivalPin);
 				   	}
 			   });
@@ -285,8 +359,55 @@ public class FightModeGame extends Activity {
 
 	private void findOpponent(String rivalPin){
 		
+		Log.d(TAG, "jasper rival pin:" + rivalPin);
+		if(!isNetworkAvailable()){
+
+			getCheckNetworkDialog().show();
+		}
+		else{
+
+			// start to connect server
+		}
+
+
+		/*
+		try{
+			String server_addr = "http://61.231.167.40/NumberGameServer/login.html";
+			URL url = new URL(server_addr);
+			HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+			urlConnection.setDoOutput(true);
+			urlConnection.setRequestMethod("POST");
+			urlConnection.setRequestProperty("Content-Type",
+			    "application/x-www-form-urlencoded");
+			String params = "param1=value1&param2=value2";
+			rlConnection.setFixedLengthStreamingMode(params.getBytes().length);
+			OutputStream out = new BufferedOutputStream(urlConnection.getOutputStream());
+
+
+		}
+		catch(Exception e){
+			Log.d(TAG, "jasper exception" + e);
+		}
+`		*/
+	}
+
+	private boolean isNetworkAvailable(){
+
+		ConnectivityManager connMgr = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+		NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+		if (networkInfo != null && networkInfo.isConnected()) {
+
+			Log.d(TAG, "jasper network available");
+			return true;
+		}
+		else{
+
+			Log.d(TAG, "jasper network not available");
+			return false;
+		}
 
 	}
+
 
 	private void setListView(){
 
