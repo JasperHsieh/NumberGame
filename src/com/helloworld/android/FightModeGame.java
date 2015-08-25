@@ -410,9 +410,43 @@ public class FightModeGame extends Activity {
 		return false;
 	}
 	
-	private Boolean checkFetched(String url) throws IOException{
+	private Boolean checkFetched(String myurl) throws IOException{
+
+		Log.d(TAG, "jasper checkFetched");
+		InputStream is = null;
+		int len = 10;
+
+		try{
+			
+			URL url = new URL(myurl);
+			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+			conn.setReadTimeout(10000);
+			conn.setConnectTimeout(15000);
+			conn.setRequestMethod("GET");
+			conn.setDoInput(true);
+
+			// start the query
+			conn.connect();
+			int response = conn.getResponseCode();
+			Log.d(TAG, "jasper response:" + response);
+			is = conn.getInputStream();
+			String fetchResult = readIt(is, len);
+			Log.d(TAG, "jasper fetchResult:" + fetchResult);
+
+			if("match".equals(fetchResult)){
+				Log.d(TAG, "jasper match! Found rival");
+				return true;
+			}
+			else{
+				Log.d(TAG, "jasper match fail");
+				return false;
+			}
+		}catch(IOException e){
+			Log.d(TAG, "jasper IOException :" + e.getMessage());
+		}
 
 		return false;
+
 	}
 	
 	private Boolean isIDLegal(String serverAssignID){
