@@ -125,6 +125,7 @@ public class FightModeGame extends Activity {
 		}
 	};
 
+	// listener for listen grid items
 	private OnClickListener mColumnListener = new OnClickListener(){
 		
 		@Override
@@ -153,6 +154,7 @@ public class FightModeGame extends Activity {
 		}
 	};
 
+	// listener to listen number 1~9
 	private OnClickListener mNumberListener = new OnClickListener(){
 		
 		@Override
@@ -190,6 +192,8 @@ public class FightModeGame extends Activity {
 			focusNext();
 		}
 	};
+
+
    	@Override
 	public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -218,7 +222,7 @@ public class FightModeGame extends Activity {
 		//getMatchDialog().show();
 	}
 
-
+	// get layout
 	private void setMyView(){
 	
 		number_1 = (TextView)findViewById(R.id.number1);
@@ -262,6 +266,7 @@ public class FightModeGame extends Activity {
 		pin_code_edit = (EditText) findViewById(R.id.pin_code);
 	}
 
+	// prepare the game before start
 	private void prepareStartGame(){
 
 		getMatchDialog().show();
@@ -269,6 +274,7 @@ public class FightModeGame extends Activity {
 
 	}
 
+	// start game
 	private void startGame(){
 
 		setCurrentNumber();
@@ -289,6 +295,7 @@ public class FightModeGame extends Activity {
 
 	}
 
+	// async task to run URl connection in background
 	private class FetchRivalTask extends AsyncTask<String, Void, Boolean>{
 
 		private String getIDURL = "";
@@ -321,6 +328,7 @@ public class FightModeGame extends Activity {
 		}
 	}
 	
+	// get the user ID from server
 	private Boolean getID(String myurl) throws IOException{
 		
 		InputStream is = null;
@@ -358,6 +366,7 @@ public class FightModeGame extends Activity {
 		return false;
 	}
 
+	// post user ID and rival ID to server
 	private Boolean postID(String myurl) throws IOException{
 		
 		int len =500;
@@ -410,6 +419,7 @@ public class FightModeGame extends Activity {
 		return false;
 	}
 	
+	// check rival is fetched from server
 	private Boolean checkFetched(String myurl) throws IOException{
 
 		Log.d(TAG, "jasper checkFetched");
@@ -449,6 +459,7 @@ public class FightModeGame extends Activity {
 
 	}
 	
+	// cehck the Id assigned from is not illegal
 	private Boolean isIDLegal(String serverAssignID){
 		
 		try{
@@ -463,6 +474,7 @@ public class FightModeGame extends Activity {
 		return true;
 	}
 	
+	// check the post request is success
 	private Boolean isPostSuccess(String response){
 		
 		return "POST_SUCCESS".equals(response);
@@ -478,6 +490,7 @@ public class FightModeGame extends Activity {
     	return new String(buffer);
 	}
 
+	// the dialog to inform user there is no network connection
 	private AlertDialog getCheckNetworkDialog(){
 		
 		Log.d(TAG, "jasper getCheckNetworkDialog");
@@ -496,6 +509,7 @@ public class FightModeGame extends Activity {
 		return builder.create();
 	}
 
+	// the dialog to allow user input the rival's ID
 	private Dialog getMatchDialog(){
 		
 		Log.d(TAG, "jasper getMatchDialog");
@@ -556,6 +570,7 @@ public class FightModeGame extends Activity {
 `		*/
 	}
 
+	// check the network is available
 	private boolean isNetworkAvailable(){
 
 		ConnectivityManager connMgr = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -572,7 +587,6 @@ public class FightModeGame extends Activity {
 		}
 
 	}
-
 
 	private void setListView(){
 
