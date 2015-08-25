@@ -23,15 +23,30 @@ import android.content.DialogInterface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
+
 import java.util.*;
 import java.lang.Character;
+import java.lang.Double;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.IOException;
+import java.io.Reader;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.HttpURLConnection;
+
 
 public class FightModeGame extends Activity {
    	
 	private final String TAG = "FightModeGame";
 	
-	private String myPin;
+	private String myID;
+	private String rivalID;
 	private Button ok_btn;
 	private Button reset_btn;
 	private TextView number_1;
@@ -197,7 +212,8 @@ public class FightModeGame extends Activity {
 		resetTargetNumber();
 		displayList = new ArrayList<String>();
 		
-		myPin = "1234";
+		myID = "0000";
+		rivalID = "0000";
 		prepareStartGame();
 		//getMatchDialog().show();
 	}
@@ -275,14 +291,17 @@ public class FightModeGame extends Activity {
 
 	private class FetchRivalTask extends AsyncTask<String, Void, Boolean>{
 
+		private String getIDURL = "";
 		private String postURL = "";
 		private String pollingURL = "";
 
 		protected Boolean doInBackground(String... urls){
 
 			try{
-				//return checkPin(url[0]);
-				if(postURL.equals(urls[0])){
+				if(getIDURL.equals(urls[0])){
+					return getID(urls[0]);
+				}
+				else if(postURL.equals(urls[0])){
 					return postID(urls[0]);
 				}
 				else if(pollingURL.equals(urls[0])){
@@ -301,17 +320,129 @@ public class FightModeGame extends Activity {
 			Log.d(TAG, "jasper fetched the rival!!!");
 		}
 	}
+	
+	private Boolean getID(String myurl) throws IOException{
+		
+		InputStream is = null;
+		int len = 10;
 
-	private Boolean postID(String url) throws IOException{
+		try{
+			
+			URL url = new URL(myurl);
+			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+			conn.setReadTimeout(10000);
+			conn.setConnectTimeout(15000);
+			conn.setRequestMethod("GET");
+			conn.setDoInput(true);
+
+			// start the query
+			conn.connect();
+			int response = conn.getResponseCode();
+			Log.d(TAG, "jasper response:" + response);
+			is = conn.getInputStream();
+			String serverAssignID = readIt(is, len);
+			Log.d(TAG, "jasper userID:" + serverAssignID);
+
+			if(!isIDLegal(serverAssignID)){
+				Log.d(TAG, "jasper server returen ID is illegal!");
+				return false;
+			}
+			else{
+				myID = serverAssignID;
+				return true;
+			}
+		}catch(IOException e){
+			Log.d(TAG, "jasper IOException :" + e.getMessage());
+		}
 
 		return false;
 	}
 
+	private Boolean postID(String myurl) throws IOException{
+		
+		int len =500;
+		String response = "";
+
+		try{
+			
+			URL url = new URL(myurl);
+			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+			conn.setReadTimeout(15000);
+			conn.setConnectTimeout(15000);
+			conn.setRequestMethod("POST");
+			conn.setDoInput(true);
+			conn.setDoOutput(true);
+			conn.setRequestProperty("Content-Type","application/x-www-form-urlencoded");
+
+			OutputStream os = conn.getOutputStream();
+			BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+			String postData = "UserID=" + myID + "&" + "RivalID=" + rivalID;
+			writer.write(postData);
+
+			writer.flush();
+			writer.close();
+			os.close();
+			int responseCode = conn.getResponseCode();
+			if( responseCode  == HttpURLConnection.HTTP_OK){
+				
+				Log.d(TAG, "jasper connection success");
+				String line;
+				BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+				while ((line = br.readLine()) != null) {
+					response+=line;
+				}
+
+				if(!isPostSuccess(response)){
+					return false;
+				}
+				else{
+					return true;
+				}
+
+			}
+			else{
+				response="";
+				throw new Exception();
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return false;
+	}
+	
 	private Boolean checkFetched(String url) throws IOException{
 
 		return false;
 	}
+	
+	private Boolean isIDLegal(String serverAssignID){
+		
+		try{
+			
+			double tmpID = Double.parseDouble(serverAssignID);
+		}
+		catch(NumberFormatException e){
+			
+			Log.d(TAG, "jasper wrong parsing string to number:" + e);
+			return false;
+		}
+		return true;
+	}
+	
+	private Boolean isPostSuccess(String response){
+		
+		return "POST_SUCCESS".equals(response);
+	}
 
+	// Reads an InputStream and converts it to a String.
+	public String readIt(InputStream stream, int len) throws IOException, UnsupportedEncodingException {
+    	
+		Reader reader = null;
+    	reader = new InputStreamReader(stream, "UTF-8");        
+    	char[] buffer = new char[len];
+    	reader.read(buffer);
+    	return new String(buffer);
+	}
 
 	private AlertDialog getCheckNetworkDialog(){
 		
@@ -346,20 +477,20 @@ public class FightModeGame extends Activity {
 				   	public void onClick(DialogInterface dialog, int id){
 				   		
 						Log.d(TAG, "jasper rival ID dialog click");
-						String rivalPin = pin_code_edit.getText().toString();
+						rivalID = pin_code_edit.getText().toString();
 						if(pin_code_edit == null){
 							Log.d(TAG, "jasper input is null");
 						}
-						findOpponent(rivalPin);
+						findOpponent();
 				   	}
 			   });
 
 		return builder.create();
 	}
 
-	private void findOpponent(String rivalPin){
+	private void findOpponent(){
 		
-		Log.d(TAG, "jasper rival pin:" + rivalPin);
+		Log.d(TAG, "jasper rival pin:" + rivalID);
 		if(!isNetworkAvailable()){
 
 			getCheckNetworkDialog().show();
