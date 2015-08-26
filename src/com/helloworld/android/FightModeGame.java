@@ -508,19 +508,24 @@ public class FightModeGame extends Activity {
 	}
 
 	// the dialog to inform user there is no network connection
-	private AlertDialog getCheckNetworkDialog(){
+	private AlertDialog myAlertDialog(final String title, final String msg){
 		
-		Log.d(TAG, "jasper getCheckNetworkDialog");
+		Log.d(TAG, "jaspe myAlertDialog");
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle(R.string.NoNetworkTitle)
-				.setMessage(R.string.NoNetworkMsg)
+		builder.setTitle(title)
+				.setMessage(msg)
 				.setPositiveButton(R.string.signin, new DialogInterface.OnClickListener(){
 
 					@Override
 					public void onClick(DialogInterface dialog, int id){
 
 						Log.d(TAG, "jasper no network click");
-						finish();
+						if("No Network Connection".equals(title)){
+							finish();
+						}
+						else if("Improper ID".equals(title)){
+							getMatchDialog().show();
+						}
 					}
 				});
 		return builder.create();
@@ -546,48 +551,49 @@ public class FightModeGame extends Activity {
 				   		
 						Log.d(TAG, "jasper rival ID dialog click");
 						rivalID = pin_code_edit.getText().toString();
-						if(pin_code_edit == null){
-							Log.d(TAG, "jasper input is null");
+						if(isOkToFindOpponent()){
+							findOpponent();
 						}
-						findOpponent();
 				   	}
 			   });
 
 		return builder.create();
 	}
 
-	private void findOpponent(){
+	private boolean isOkToFindOpponent(){
 		
-		Log.d(TAG, "jasper rival pin:" + rivalID);
+		Log.d(TAG, "jasper isOkToFindOpponent");
+		String title;
+		String msg;
 		if(!isNetworkAvailable()){
 
-			getCheckNetworkDialog().show();
+			title = "No Network Connection";
+			msg = "Please connect to the network";
+			myAlertDialog(title, msg).show();
+
+			return false;
 		}
 		else{
+			if(rivalID.isEmpty()){
 
-			// start to connect server
+				title = "Improper ID";
+				msg = "Please input 8 digits number";
+				myAlertDialog(title, msg).show();
+
+				return false;
+			}
+			else{
+				return true;
+			}
 		}
 
+	}
 
-		/*
-		try{
-			String server_addr = "http://61.231.167.40/NumberGameServer/login.html";
-			URL url = new URL(server_addr);
-			HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-			urlConnection.setDoOutput(true);
-			urlConnection.setRequestMethod("POST");
-			urlConnection.setRequestProperty("Content-Type",
-			    "application/x-www-form-urlencoded");
-			String params = "param1=value1&param2=value2";
-			rlConnection.setFixedLengthStreamingMode(params.getBytes().length);
-			OutputStream out = new BufferedOutputStream(urlConnection.getOutputStream());
+	private void findOpponent(){
+
+		Log.d(TAG, "jasper rival pin:" + rivalID);
 
 
-		}
-		catch(Exception e){
-			Log.d(TAG, "jasper exception" + e);
-		}
-`		*/
 	}
 
 	// check the network is available
