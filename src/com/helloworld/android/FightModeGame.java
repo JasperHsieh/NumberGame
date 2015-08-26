@@ -63,12 +63,17 @@ public class FightModeGame extends Activity {
 	private Button eight_btn;
 	private Button nine_btn;
 	private ListView resultList;
-	private EditText pin_code_edit;
+	private TextView show_userID;
+	private	EditText pin_code_edit;
 
 	private int focusColumn;
 	private String targetNumber;
 	private ArrayList<Number> currentList;
 	private ArrayList<String> displayList;
+
+	private final String get_user_ID_URL = "";
+	private final String post_ID_URL = "";
+	private final String check_fetched_URL = "";
 
 	// number object to store number and match level
 	// 0: no match anything
@@ -201,25 +206,9 @@ public class FightModeGame extends Activity {
 		Log.d(TAG, "jasper onCreate");
 		// set layout and get view
         setContentView(R.layout.fightmode);
+		
 		setMyView();
-
-		// set default focus column to be the first one
-		focusColumn = 1;
-		
-		// initial arraylist size=4
-		currentList = new ArrayList<Number>();
-		for(int i=0; i<4; i++){
-			Number tmpNumber = new Number();
-			currentList.add(tmpNumber);
-		}
-
-		resetTargetNumber();
-		displayList = new ArrayList<String>();
-		
-		myID = "0000";
-		rivalID = "0000";
 		prepareStartGame();
-		//getMatchDialog().show();
 	}
 
 	// get layout
@@ -263,11 +252,26 @@ public class FightModeGame extends Activity {
 		eight_btn.setOnClickListener(mNumberListener);
 		nine_btn.setOnClickListener(mNumberListener);
 
-		pin_code_edit = (EditText) findViewById(R.id.pin_code);
 	}
 
 	// prepare the game before start
 	private void prepareStartGame(){
+
+		// set default focus column to be the first one
+		focusColumn = 1;
+
+		// initial arraylist size=4
+		currentList = new ArrayList<Number>();
+		for(int i=0; i<4; i++){
+			Number tmpNumber = new Number();
+			currentList.add(tmpNumber);
+		}
+
+		resetTargetNumber();
+		displayList = new ArrayList<String>();
+
+		myID = IdGenerater();
+		rivalID = "00000000";
 
 		getMatchDialog().show();
 
@@ -293,6 +297,19 @@ public class FightModeGame extends Activity {
 		displayList.add(currentResult);
 		setListView();
 
+	}
+
+	private String IdGenerater(){
+
+		Random r = new Random();
+		int rn = -1;
+		String ID = "";
+		for(int i=0; i<8; i++){
+			rn = r.nextInt(10);
+			ID += rn;
+
+		}
+		return ID;
 	}
 
 	// async task to run URl connection in background
@@ -322,9 +339,9 @@ public class FightModeGame extends Activity {
 			return false;
 		}
 
-		protected void onPostExecute(Boolean isFetch){
+		protected void onPostExecute(Boolean result){
 
-			Log.d(TAG, "jasper fetched the rival!!!");
+			Log.d(TAG, "jasper URL connection :" + result);
 		}
 	}
 	
@@ -516,7 +533,10 @@ public class FightModeGame extends Activity {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		LayoutInflater inflater = this.getLayoutInflater();
 		View v = inflater.inflate(R.layout.pairdialog, null);
+		show_userID = (TextView) v.findViewById(R.id.userID_msg);
 		pin_code_edit = (EditText) v.findViewById(R.id.pin_code);
+
+		show_userID.setText("Your ID is " + myID);
 
 		builder.setView(v)
 			   .setPositiveButton(R.string.signin, new DialogInterface.OnClickListener() {

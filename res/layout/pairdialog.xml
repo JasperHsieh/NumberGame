@@ -5,10 +5,15 @@
 	android:orientation="vertical">
 	
 	<TextView
-		android:id="@+id/paring_msg"
+		android:id="@+id/pairng_msg"
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
 		android:text="@string/ParingMsg"/>
+	<TextView
+		android:id="@+id/userID_msg"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:text="@string/Empty"/>
 	<EditText
 		android:id="@+id/pin_code"
 		android:layout_width="fill_parent"

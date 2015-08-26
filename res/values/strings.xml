@@ -4,6 +4,7 @@
     <!-- welcome -->
 	<string name="Level">Level mode</string>
 	<string name="Fight">Fight mode</string>
+	<string name="Empty"></string>
 	<!-- fight mode -->
 	<string name="NoNetworkTitle">No network connection</string>
 	<string name="NoNetworkMsg">Please connect to the internet</string>

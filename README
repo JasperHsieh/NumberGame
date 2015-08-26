@@ -1,0 +1,7 @@
+onCreate(){
+	
+	GET user ID from server
+	let user input rival ID
+	POSt user ID and rival ID to server
+	keep polling to check match or not
+}
