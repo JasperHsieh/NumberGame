@@ -4,47 +4,6 @@
     android:layout_height="fill_parent"
     android:orientation="vertical" >
 
-	<RelativeLayout
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"
-		android:layout_weight="1">
-
-		<ProgressBar
-			android:id="@+id/fetch_progress"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			style="?android:attr/progressBarStyleLarge"
-			android:layout_centerInParent="true"
-			android:visibility="gone"/>
-	</RelativeLayout>
-
-	<RelativeLayout
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"
-		android:orientation="vertical"
-		android:layout_weight="1">
-
-		<ListView
-			android:id="@+id/result_list"
-			android:layout_width="fill_parent"
-			android:layout_height="wrap_content"
-			android:visibility="gone"/>
-	</RelativeLayout>
-
-	<LinearLayout
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:orientation="horizontal"
-		android:layout_gravity="center_horizontal"
-		android:layout_marginTop="10dp">
-
-		<Button
-			android:id="@+id/go"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:text="@string/Go"/>
-	</LinearLayout>
-
 	<GridLayout
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
@@ -92,6 +51,39 @@
 	<LinearLayout
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
+		android:orientation="horizontal"
+		android:layout_gravity="center_horizontal"
+		android:layout_marginTop="10dp">
+
+		<Button
+			android:id="@+id/go"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="@string/Go"/>
+		<Button
+			android:id="@+id/reset"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="@string/Reset"/>
+	
+	</LinearLayout>
+
+	<RelativeLayout
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:orientation="vertical"
+		android:layout_weight="1">
+
+		<ListView
+			android:id="@+id/result_list"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			/>
+	</RelativeLayout>
+
+	<LinearLayout
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
 		android:orientation="vertical"
 		android:layout_gravity="center_horizontal">
 		
@@ -100,13 +92,8 @@
 			android:layout_height="wrap_content"
 			android:orientation="horizontal"
 			android:layout_gravity="center_horizontal"
-			android:layout_marginBottom="15dp">
+			android:layout_marginBottom="30dp">
 
-			<Button
-				android:id="@+id/zero"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:text="@string/Zero"/>
 			<Button
 				android:id="@+id/one"
 				android:layout_width="wrap_content"

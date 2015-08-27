@@ -11,6 +11,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.view.WindowManager;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -47,12 +48,15 @@ public class FightModeGame extends Activity {
 	
 	private String myID;
 	private String rivalID;
+
 	private Button ok_btn;
-	private Button reset_btn;
+
 	private TextView number_1;
 	private TextView number_2;
 	private TextView number_3;
 	private TextView number_4;
+
+	private Button zero_btn;
 	private Button one_btn;
 	private Button two_btn;
 	private Button three_btn;
@@ -62,9 +66,11 @@ public class FightModeGame extends Activity {
 	private Button seven_btn;
 	private Button eight_btn;
 	private Button nine_btn;
+
 	private ListView resultList;
 	private TextView show_userID;
 	private	EditText pin_code_edit;
+	private ProgressBar mProgressBar;
 
 	private int focusColumn;
 	private String targetNumber;
@@ -117,16 +123,6 @@ public class FightModeGame extends Activity {
 		@Override
 		public void onClick(View view){
 
-			switch(view.getId()){
-
-				case R.id.go:
-					startGame();
-					break;
-				case R.id.reset:
-					resetTargetNumber();
-					cleanup();
-					break;
-			}
 		}
 	};
 
@@ -166,6 +162,9 @@ public class FightModeGame extends Activity {
 		public void onClick(View view){
 			
 			switch(view.getId()){
+				case R.id.zero:
+					setNumber(0);
+					break;
 				case R.id.one:
 					setNumber(1);
 					break;
@@ -214,14 +213,16 @@ public class FightModeGame extends Activity {
 	// get layout
 	private void setMyView(){
 	
+		mProgressBar = (ProgressBar) findViewById(R.id.fetch_progress);
+
 		number_1 = (TextView)findViewById(R.id.number1);
 		number_2 = (TextView)findViewById(R.id.number2);
 		number_3 = (TextView)findViewById(R.id.number3);
 		number_4 = (TextView)findViewById(R.id.number4);
 
 		ok_btn = (Button)findViewById(R.id.go);
-		reset_btn = (Button)findViewById(R.id.reset);
 
+		zero_btn = (Button)findViewById(R.id.zero);
 		one_btn = (Button)findViewById(R.id.one);
 		two_btn = (Button)findViewById(R.id.two);
 		three_btn = (Button)findViewById(R.id.three);
@@ -240,8 +241,8 @@ public class FightModeGame extends Activity {
 		number_4.setOnClickListener(mColumnListener);
 
 		ok_btn.setOnClickListener(mListener);
-		reset_btn.setOnClickListener(mListener);
 
+		zero_btn.setOnClickListener(mNumberListener);
 		one_btn.setOnClickListener(mNumberListener);
 		two_btn.setOnClickListener(mNumberListener);
 		three_btn.setOnClickListener(mNumberListener);
@@ -267,7 +268,7 @@ public class FightModeGame extends Activity {
 			currentList.add(tmpNumber);
 		}
 
-		resetTargetNumber();
+		//resetTargetNumber();
 		displayList = new ArrayList<String>();
 
 		myID = IdGenerater();
@@ -593,6 +594,8 @@ public class FightModeGame extends Activity {
 
 		Log.d(TAG, "jasper rival pin:" + rivalID);
 		new FetchRivalTask().execute(post_ID_URL);
+
+		startProgressBar();
 	}
 
 	// check the network is available
@@ -611,6 +614,18 @@ public class FightModeGame extends Activity {
 			return false;
 		}
 
+	}
+
+	private void startProgressBar(){
+
+		Log.d(TAG, "jasper start progress bar");
+		mProgressBar.setVisibility(View.VISIBLE);
+	}
+
+	private void stopProgressBar(){
+
+		Log.d(TAG, "jasper stop progress bar");
+		mProgressBar.setVisibility(View.GONE);
 	}
 
 	private void setListView(){

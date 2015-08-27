@@ -88,7 +88,7 @@ public class HelloWorldActivity extends Activity {
         
 		Log.d(TAG, "jasper onCreate");
 		// set layout and get view
-        setContentView(R.layout.main);
+        setContentView(R.layout.helloworld);
 		setMyView();
 
 		// set default focus column to be the first one
