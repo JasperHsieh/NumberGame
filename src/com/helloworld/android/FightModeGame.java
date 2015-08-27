@@ -71,7 +71,7 @@ public class FightModeGame extends Activity {
 	private ArrayList<Number> currentList;
 	private ArrayList<String> displayList;
 
-	private final String get_user_ID_URL = "";
+	//private final String get_user_ID_URL = "";
 	private final String post_ID_URL = "";
 	private final String check_fetched_URL = "";
 
@@ -592,7 +592,7 @@ public class FightModeGame extends Activity {
 	private void findOpponent(){
 
 		Log.d(TAG, "jasper rival pin:" + rivalID);
-
+		new FetchRivalTask().execute(post_ID_URL);
 	}
 
 	// check the network is available
