@@ -322,10 +322,7 @@ public class FightModeGame extends Activity {
 		protected Boolean doInBackground(String... urls){
 
 			try{
-				if(getIDURL.equals(urls[0])){
-					return getID(urls[0]);
-				}
-				else if(postURL.equals(urls[0])){
+				if(postURL.equals(urls[0])){
 					return postID(urls[0]);
 				}
 				else if(pollingURL.equals(urls[0])){
@@ -344,7 +341,7 @@ public class FightModeGame extends Activity {
 			Log.d(TAG, "jasper URL connection :" + result);
 		}
 	}
-	
+/*
 	// get the user ID from server
 	private Boolean getID(String myurl) throws IOException{
 		
@@ -382,7 +379,7 @@ public class FightModeGame extends Activity {
 
 		return false;
 	}
-
+*/
 	// post user ID and rival ID to server
 	private Boolean postID(String myurl) throws IOException{
 		
@@ -562,6 +559,9 @@ public class FightModeGame extends Activity {
 
 	private boolean isOkToFindOpponent(){
 		
+		// check network connection first
+		// and then check input rival's ID is legal
+
 		Log.d(TAG, "jasper isOkToFindOpponent");
 		String title;
 		String msg;
@@ -592,7 +592,6 @@ public class FightModeGame extends Activity {
 	private void findOpponent(){
 
 		Log.d(TAG, "jasper rival pin:" + rivalID);
-
 
 	}
 
