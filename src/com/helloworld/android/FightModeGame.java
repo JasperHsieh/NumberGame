@@ -78,7 +78,7 @@ public class FightModeGame extends Activity {
 	private ArrayList<String> displayList;
 
 	//private final String get_user_ID_URL = "";
-	private final String post_ID_URL = "";
+	private final String post_ID_URL = "http://61.230.44.197:3000";
 	private final String check_fetched_URL = "";
 
 	// number object to store number and match level
@@ -316,17 +316,15 @@ public class FightModeGame extends Activity {
 	// async task to run URl connection in background
 	private class FetchRivalTask extends AsyncTask<String, Void, Boolean>{
 
-		private String getIDURL = "";
-		private String postURL = "";
-		private String pollingURL = "";
 
 		protected Boolean doInBackground(String... urls){
 
+			Log.d(TAG, "jasper doInBackground");
 			try{
-				if(postURL.equals(urls[0])){
+				if(post_ID_URL.equals(urls[0])){
 					return postID(urls[0]);
 				}
-				else if(pollingURL.equals(urls[0])){
+				else if(check_fetched_URL.equals(urls[0])){
 					return checkFetched(urls[0]);
 				}
 			}
@@ -339,6 +337,7 @@ public class FightModeGame extends Activity {
 
 		protected void onPostExecute(Boolean result){
 
+			Log.d(TAG, "jasper onPostExecute");
 			Log.d(TAG, "jasper URL connection :" + result);
 		}
 	}
@@ -384,6 +383,7 @@ public class FightModeGame extends Activity {
 	// post user ID and rival ID to server
 	private Boolean postID(String myurl) throws IOException{
 		
+		Log.d(TAG, "jasper postID");
 		int len =500;
 		String response = "";
 
@@ -415,7 +415,7 @@ public class FightModeGame extends Activity {
 				while ((line = br.readLine()) != null) {
 					response+=line;
 				}
-
+				Log.d(TAG, "jasper reponse:" + response);
 				if(!isPostSuccess(response)){
 					return false;
 				}
