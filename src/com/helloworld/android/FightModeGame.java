@@ -12,6 +12,7 @@ import android.widget.ListView;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 import android.view.WindowManager;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -48,6 +49,7 @@ public class FightModeGame extends Activity {
 	
 	private String myID;
 	private String rivalID;
+	private int check_retry = 0;
 
 	private Button ok_btn;
 
@@ -271,9 +273,9 @@ public class FightModeGame extends Activity {
 		//resetTargetNumber();
 		displayList = new ArrayList<String>();
 
-		myID = IdGenerater();
+		//myID = IdGenerater();
+		myID = "99999999";
 		rivalID = "00000000";
-
 		getMatchDialog().show();
 
 
@@ -313,8 +315,8 @@ public class FightModeGame extends Activity {
 		return ID;
 	}
 
-	// async task to run URl connection in background
-	private class FetchRivalTask extends AsyncTask<String, Void, Boolean>{
+	// async task to post ID using  URl connection in background
+	private class PostIDTask extends AsyncTask<String, Void, Boolean>{
 
 
 		protected Boolean doInBackground(String... urls){
@@ -323,9 +325,6 @@ public class FightModeGame extends Activity {
 			try{
 				if(post_ID_URL.equals(urls[0])){
 					return postID(urls[0]);
-				}
-				else if(check_fetched_URL.equals(urls[0])){
-					return checkFetched(urls[0]);
 				}
 			}
 			catch(IOException e){
@@ -341,45 +340,49 @@ public class FightModeGame extends Activity {
 			Log.d(TAG, "jasper URL connection :" + result);
 		}
 	}
-/*
-	// get the user ID from server
-	private Boolean getID(String myurl) throws IOException{
-		
-		InputStream is = null;
-		int len = 10;
 
-		try{
-			
-			URL url = new URL(myurl);
-			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-			conn.setReadTimeout(10000);
-			conn.setConnectTimeout(15000);
-			conn.setRequestMethod("GET");
-			conn.setDoInput(true);
+	// Async task to check pair state using URL connection in background
+	private class checkPairTask extends AsyncTask<String, Void, Boolean>{
 
-			// start the query
-			conn.connect();
-			int response = conn.getResponseCode();
-			Log.d(TAG, "jasper response:" + response);
-			is = conn.getInputStream();
-			String serverAssignID = readIt(is, len);
-			Log.d(TAG, "jasper userID:" + serverAssignID);
 
-			if(!isIDLegal(serverAssignID)){
-				Log.d(TAG, "jasper server returen ID is illegal!");
+		protected Boolean doInBackground(String... urls){
+
+			Log.d(TAG, "jasper doInBackground");
+			try{
+				if(check_fetched_URL.equals(urls[0])){
+					return checkFetched(urls[0]);
+				}
+			}
+			catch(IOException e){
+				Log.d(TAG, "jasper unable to retrieve the URL :" + e);
 				return false;
 			}
-			else{
-				myID = serverAssignID;
-				return true;
-			}
-		}catch(IOException e){
-			Log.d(TAG, "jasper IOException :" + e.getMessage());
+			return false;
 		}
 
-		return false;
+		protected void onPostExecute(Boolean result){
+
+			Log.d(TAG, "jasper onPostExecute");
+			if((!result) && (check_retry < 10)){
+				try{
+					Thread.sleep(1000);
+					new checkPairTask().execute(check_fetched_URL);
+					check_retry++;
+				}catch(InterruptedException e){
+					Log.d(TAG, "jasper thread sleep exception:" + e);
+				}
+			}
+			else{
+				check_retry = 0;
+				if(check_retry >= 10){
+					handleTimeout();
+				}
+			}
+
+
+		}
 	}
-*/
+
 	// post user ID and rival ID to server
 	private Boolean postID(String myurl) throws IOException{
 		
@@ -505,6 +508,14 @@ public class FightModeGame extends Activity {
     	return new String(buffer);
 	}
 
+	// handle check paired GET request fail
+	private void handleTimeout(){
+
+		stopProgressBar();
+		Toast.makeText(this, "Can't fectch rival", Toast.LENGTH_SHORT).show();
+
+	}
+
 	// the dialog to inform user there is no network connection
 	private AlertDialog myAlertDialog(final String title, final String msg){
 		
@@ -593,9 +604,9 @@ public class FightModeGame extends Activity {
 	private void findOpponent(){
 
 		Log.d(TAG, "jasper rival pin:" + rivalID);
-		new FetchRivalTask().execute(post_ID_URL);
-
+		new PostIDTask().execute(post_ID_URL);
 		startProgressBar();
+		new checkPairTask().execute(check_fetched_URL);
 	}
 
 	// check the network is available
