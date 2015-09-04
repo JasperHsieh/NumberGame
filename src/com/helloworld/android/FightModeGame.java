@@ -80,8 +80,9 @@ public class FightModeGame extends Activity {
 	private ArrayList<String> displayList;
 
 	//private final String get_user_ID_URL = "";
-	private final String post_ID_URL = "http://61.230.44.197:3000";
-	private final String check_fetched_URL = "";
+	private final String post_ID_URL = "http://118.166.88.157:3000";
+	private final String check_fetched_URL = "http://118.166.88.157:3000/checkFetched";
+	private final String check_table_URL = "http://118.166.88.157:3000/checkTable";
 
 	// number object to store number and match level
 	// 0: no match anything
@@ -315,76 +316,40 @@ public class FightModeGame extends Activity {
 		return ID;
 	}
 
-	// async task to post ID using  URl connection in background
-	private class PostIDTask extends AsyncTask<String, Void, Boolean>{
+	// Async task for making POST request
+	private class makePostRequest extends AsyncTask<String, Void, String>{
 
+		protected String doInBackground(String... urls){
 
-		protected Boolean doInBackground(String... urls){
-
-			Log.d(TAG, "jasper doInBackground");
+			String postData = "";
 			try{
 				if(post_ID_URL.equals(urls[0])){
-					return postID(urls[0]);
+
+					postData = "UserID=" + myID + "&" + "RivalID=" + rivalID;
 				}
+				else if(check_fetched_URL.equals(urls[0])){
+
+					postData = "PollingID=" + myID;
+				}
+				else if(check_table_URL.equals(urls[0])){
+				}
+
+				return postRequest(urls[0], postData);
 			}
 			catch(IOException e){
+
 				Log.d(TAG, "jasper unable to retrieve the URL :" + e);
-				return false;
 			}
-			return false;
+
+			return "test";
 		}
 
-		protected void onPostExecute(Boolean result){
-
-			Log.d(TAG, "jasper onPostExecute");
-			Log.d(TAG, "jasper URL connection :" + result);
-		}
-	}
-
-	// Async task to check pair state using URL connection in background
-	private class checkPairTask extends AsyncTask<String, Void, Boolean>{
-
-
-		protected Boolean doInBackground(String... urls){
-
-			Log.d(TAG, "jasper doInBackground");
-			try{
-				if(check_fetched_URL.equals(urls[0])){
-					return checkFetched(urls[0]);
-				}
-			}
-			catch(IOException e){
-				Log.d(TAG, "jasper unable to retrieve the URL :" + e);
-				return false;
-			}
-			return false;
-		}
-
-		protected void onPostExecute(Boolean result){
-
-			Log.d(TAG, "jasper onPostExecute");
-			if((!result) && (check_retry < 10)){
-				try{
-					Thread.sleep(1000);
-					new checkPairTask().execute(check_fetched_URL);
-					check_retry++;
-				}catch(InterruptedException e){
-					Log.d(TAG, "jasper thread sleep exception:" + e);
-				}
-			}
-			else{
-				check_retry = 0;
-				if(check_retry >= 10){
-					handleTimeout();
-				}
-			}
-
+		protected void onPostExecute(String result){
 
 		}
 	}
 
-	// post user ID and rival ID to server
-	private Boolean postID(String myurl) throws IOException{
+	private String postRequest(String myurl, String postData) throws IOException{
 		
 		Log.d(TAG, "jasper postID");
 		int len =500;
@@ -403,7 +368,6 @@ public class FightModeGame extends Activity {
 
 			OutputStream os = conn.getOutputStream();
 			BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
-			String postData = "UserID=" + myID + "&" + "RivalID=" + rivalID;
 			writer.write(postData);
 
 			writer.flush();
@@ -418,13 +382,10 @@ public class FightModeGame extends Activity {
 				while ((line = br.readLine()) != null) {
 					response+=line;
 				}
+
 				Log.d(TAG, "jasper reponse:" + response);
-				if(!isPostSuccess(response)){
-					return false;
-				}
-				else{
-					return true;
-				}
+
+				return handleRequest(response);
 
 			}
 			else{
@@ -432,51 +393,17 @@ public class FightModeGame extends Activity {
 				throw new Exception();
 			}
 		}catch(Exception e){
+			Log.d(TAG, "jasper post exception" + e);
 			e.printStackTrace();
+			return "Exception happened";
 		}
-		return false;
 	}
 	
-	// check rival is fetched from server
-	private Boolean checkFetched(String myurl) throws IOException{
+	private String handleRequest(String res){
 
-		Log.d(TAG, "jasper checkFetched");
-		InputStream is = null;
-		int len = 10;
-
-		try{
-			
-			URL url = new URL(myurl);
-			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-			conn.setReadTimeout(10000);
-			conn.setConnectTimeout(15000);
-			conn.setRequestMethod("GET");
-			conn.setDoInput(true);
-
-			// start the query
-			conn.connect();
-			int response = conn.getResponseCode();
-			Log.d(TAG, "jasper response:" + response);
-			is = conn.getInputStream();
-			String fetchResult = readIt(is, len);
-			Log.d(TAG, "jasper fetchResult:" + fetchResult);
-
-			if("match".equals(fetchResult)){
-				Log.d(TAG, "jasper match! Found rival");
-				return true;
-			}
-			else{
-				Log.d(TAG, "jasper match fail");
-				return false;
-			}
-		}catch(IOException e){
-			Log.d(TAG, "jasper IOException :" + e.getMessage());
-		}
-
-		return false;
-
+		return "test";
 	}
-	
+
 	// cehck the Id assigned from is not illegal
 	private Boolean isIDLegal(String serverAssignID){
 		
@@ -604,9 +531,9 @@ public class FightModeGame extends Activity {
 	private void findOpponent(){
 
 		Log.d(TAG, "jasper rival pin:" + rivalID);
-		new PostIDTask().execute(post_ID_URL);
 		startProgressBar();
-		new checkPairTask().execute(check_fetched_URL);
+		new makePostRequest().execute(post_ID_URL);
+		//new checkPairTask().execute(check_fetched_URL);
 	}
 
 	// check the network is available
