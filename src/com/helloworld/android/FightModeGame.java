@@ -25,7 +25,6 @@ import android.content.DialogInterface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
-
 import java.util.*;
 import java.lang.Character;
 import java.lang.Double;
@@ -42,11 +41,14 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.HttpURLConnection;
 
+import org.json.JSONObject;
+import org.json.JSONException;
+
 
 public class FightModeGame extends Activity {
    	
 	private final String TAG = "FightModeGame";
-	
+
 	private String myID;
 	private String rivalID;
 	private int check_retry = 0;
@@ -80,7 +82,7 @@ public class FightModeGame extends Activity {
 	private ArrayList<String> displayList;
 
 	//private final String get_user_ID_URL = "";
-	private final String post_ID_URL = "http://118.166.88.157:3000";
+	private final String post_ID_URL = "http://118.166.88.157:3000/postID";
 	private final String check_fetched_URL = "http://118.166.88.157:3000/checkFetched";
 	private final String check_table_URL = "http://118.166.88.157:3000/checkTable";
 
@@ -329,7 +331,12 @@ public class FightModeGame extends Activity {
 				}
 				else if(check_fetched_URL.equals(urls[0])){
 
-					postData = "PollingID=" + myID;
+					try{
+						Thread.sleep(500);
+						postData = "PollingID=" + myID;
+					}catch(InterruptedException e){
+						Log.d(TAG, "jasper thread sleep exception:" + e);
+					}
 				}
 				else if(check_table_URL.equals(urls[0])){
 				}
@@ -346,13 +353,53 @@ public class FightModeGame extends Activity {
 
 		protected void onPostExecute(String result){
 
+			JSONObject Jobj = stringToJson(result);
+			String requestType = "";
+			String requestResult = "";
+
+			try{
+				requestType = Jobj.getString("postType");
+				requestResult = Jobj.getString("result");
+			}catch(JSONException e){
+				Log.d(TAG, "jasper json parse exception:" + e);
+			}
+
+			if("postID".equals(requestType)){
+
+				if("Success".equals(requestResult)){
+
+					new makePostRequest().execute(check_fetched_URL);
+				}
+				else{
+					new makePostRequest().execute(post_ID_URL);
+				}
+			}
+			else if("pollingID".equals(requestType)){
+
+				if("Success".equals(requestResult)){
+
+					// Rival found, ready to start game
+					Log.d(TAG, "jasper rival found, ready to start game");
+					Toast.makeText(getApplicationContext(), "Rival found, ready to start game", Toast.LENGTH_LONG).show();
+
+				}
+				else{
+
+					new makePostRequest().execute(check_fetched_URL);
+
+				}
+			}
+			else if("checkTable".equals(requestType)){
+
+			}
+
 		}
 	}
 
 	private String postRequest(String myurl, String postData) throws IOException{
 		
 		Log.d(TAG, "jasper postID");
-		int len =500;
+		int len = 500;
 		String response = "";
 
 		try{
@@ -385,7 +432,7 @@ public class FightModeGame extends Activity {
 
 				Log.d(TAG, "jasper reponse:" + response);
 
-				return handleRequest(response);
+				return response;
 
 			}
 			else{
@@ -399,9 +446,21 @@ public class FightModeGame extends Activity {
 		}
 	}
 	
-	private String handleRequest(String res){
+	private JSONObject stringToJson(String str){
 
-		return "test";
+		JSONObject obj = null;
+		try{
+
+			obj = new JSONObject(str);
+			Log.d(TAG, "jasper json:" + obj.toString());
+
+			return obj;
+
+		}catch(Throwable t){
+
+			Log.e(TAG, "jasper can not parse malformed string:" + str);
+		}
+		return obj;
 	}
 
 	// cehck the Id assigned from is not illegal
