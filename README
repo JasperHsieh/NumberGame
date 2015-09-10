@@ -5,4 +5,25 @@ onCreate(){
 	keep polling to check match or not
 }
 
+server side
+
+JSON
+
+/postID
+requestType
+requestResult
+
+/pollingID
+requestType
+requestResult
+targetNumber
+startFirst
+tableName
+
+/checkTable
+requestType
+requestResult
+
+
+
 
