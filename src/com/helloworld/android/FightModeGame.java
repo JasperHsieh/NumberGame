@@ -83,9 +83,11 @@ public class FightModeGame extends Activity {
 	private ArrayList<String> displayList;
 
 	//private final String get_user_ID_URL = "";
-	private final String post_ID_URL = "http://118.166.88.157:3000/postID";
-	private final String check_fetched_URL = "http://118.166.88.157:3000/checkFetched";
-	private final String check_table_URL = "http://118.166.88.157:3000/checkTable";
+	private final String server_domin = "http://118.166.88.157:3000/";
+	private final String post_ID_URL = server_domin + "postID";
+	private final String check_fetched_URL = server_domin + "checkFetched";
+	private final String check_table_URL = server_domin + "checkTable";
+	private final String submit_Numbers_URL = server_domin + "submitNumbers";
 
 	// number object to store number and match level
 	// 0: no match anything
@@ -129,6 +131,7 @@ public class FightModeGame extends Activity {
 		@Override
 		public void onClick(View view){
 
+			submitNumber();
 		}
 	};
 
@@ -316,7 +319,30 @@ public class FightModeGame extends Activity {
 		enableUI();
 	}
 
+	private void submitNumber(){
+
+		setCurrentNumber();
+		//getCurrentNumber();
+		startCompare();
+		String compareResult = getCompareResult();
+
+		Log.d(TAG, "jasper " + compareResult);
+
+		String currentNumbers = "";
+		for(int i=0; i<4; i++){
+			currentNumbers = currentNumbers + currentList.get(i).no;
+		}
+
+		String currentResult = currentNumbers + "    " + compareResult;
+		displayList.add(currentResult);
+		setListView();
+
+		new makePostRequest().execute(submit_Numbers_URL);
+	}
+
 	private void enableUI(){
+
+		enableButton(ok_btn);
 	}
 
 	private void disableUI(){
