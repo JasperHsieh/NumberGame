@@ -79,6 +79,8 @@ public class FightModeGame extends Activity {
 	private ProgressBar mProgressBar;
 
 	private int focusColumn;
+	private String currentNumbers;
+	private String currentResult;
 	private ArrayList<Number> currentList;
 	private ArrayList<String> displayList;
 
@@ -288,25 +290,10 @@ public class FightModeGame extends Activity {
 
 	private void prepareStartGame(JSONObject obj){
 
-		boolean startFirst = false;
 		try{
 
 			targetNumber = obj.getString("targetNumber");
-			startFirst = obj.getBoolean("startFirst");
 			tableName = obj.getString("tableName");
-
-			if(!startFirst){
-
-				//disableButton(ok_btn);
-				disableUI();
-				waitForOpponent();
-			}
-			else{
-
-				startGame();
-			}
-
-
 
 		}catch(JSONException e){
 			Log.e(TAG, "jasper parse json failed:" + e);
@@ -314,9 +301,26 @@ public class FightModeGame extends Activity {
 	}
 
 	// start game
-	private void startGame(){
+	private void startGame(JSONObject obj){
 
-		enableUI();
+		boolean startFirst = false;
+
+		try{
+
+			startFirst = obj.getBoolean("startFirst");
+			if(!startFirst){
+
+				disableUI();
+				pauseGame();
+			}
+			else{
+
+				resumeGame();
+			}
+		}catch(JSONException e){
+
+			Log.e(TAG, "jasper parse json failed:" + e);
+		}
 	}
 
 	private void submitNumber(){
@@ -324,20 +328,31 @@ public class FightModeGame extends Activity {
 		setCurrentNumber();
 		//getCurrentNumber();
 		startCompare();
-		String compareResult = getCompareResult();
+		currentResult = getCompareResult();
 
-		Log.d(TAG, "jasper " + compareResult);
+		Log.d(TAG, "jasper " + currentResult);
 
-		String currentNumbers = "";
+		currentNumbers = "";
 		for(int i=0; i<4; i++){
 			currentNumbers = currentNumbers + currentList.get(i).no;
 		}
 
-		String currentResult = currentNumbers + "    " + compareResult;
-		displayList.add(currentResult);
+		String displayResult = currentNumbers + "    " + currentResult;
+		displayList.add(displayResult);
 		setListView();
 
 		new makePostRequest().execute(submit_Numbers_URL);
+	}
+
+	private void resumeGame(){
+
+		enableUI();
+	}
+
+	private void pauseGame(){
+
+		disableUI();
+		new makePostRequest().execute(check_table_URL);
 	}
 
 	private void enableUI(){
@@ -348,31 +363,6 @@ public class FightModeGame extends Activity {
 	private void disableUI(){
 
 		disableButton(ok_btn);
-	}
-/*
-	private void startGame(){
-
-		setCurrentNumber();
-		getCurrentNumber();
-		startCompare();
-		String compareResult = getCompareResult();
-
-		Log.d(TAG, "jasper " + compareResult);
-
-		String currentResult = "";
-		for(int i=0; i<4; i++){
-			currentResult = currentResult + currentList.get(i).no;
-		}
-
-		currentResult = currentResult + "    " + compareResult;
-		displayList.add(currentResult);
-		setListView();
-
-	}
-*/
-	private void waitForOpponent(){
-
-		new makePostRequest().execute(check_table_URL);
 	}
 
 	private void enableButton(Button btn){
@@ -435,6 +425,12 @@ public class FightModeGame extends Activity {
 					}
 
 				}
+				else if(submit_Numbers_URL.equals(urls[0])){
+
+					// submit user input numbers to server
+					postData = "UserID=" + myID + "&" + "guessNumber=" + currentNumbers
+								+ "&" + "guestResult=" + currentResult;
+				}
 
 				return postRequest(urls[0], postData);
 			}
@@ -467,24 +463,29 @@ public class FightModeGame extends Activity {
 				// handle post ID request return
 				if("Success".equals(requestResult)){
 
+					// start to check pair state
 					new makePostRequest().execute(check_fetched_URL);
 				}
 				else{
+
+					// keep posting ID
 					new makePostRequest().execute(post_ID_URL);
 				}
 			}
-			else if("pollingID".equals(requestType)){
+			else if("checkPairState".equals(requestType)){
 
-				// handle polling ID request return
+				// handle check pair state request return
 				if("Success".equals(requestResult)){
 
 					// Rival found, ready to start game
 					Log.d(TAG, "jasper rival found, ready to start game");
 					Toast.makeText(getApplicationContext(), "Rival found, ready to start game", Toast.LENGTH_LONG).show();
 					prepareStartGame(Jobj);
+					startGame(Jobj);
 				}
 				else{
 
+					// keep checking pair state
 					new makePostRequest().execute(check_fetched_URL);
 
 				}
@@ -494,13 +495,26 @@ public class FightModeGame extends Activity {
 				// handle check number table request return
 				if("Success".equals(requestResult)){
 
-					startGame();
+					resumeGame();
 				}
 				else{
 
+					// keep checking table numbers
 					new makePostRequest().execute(check_table_URL);
 				}
 
+			}
+			else if("submitNumbers".equals(requestResult)){
+
+				if("Success". equals(requestResult)){
+
+					pauseGame();
+				}
+				else{
+
+					// submit again
+					new makePostRequest().execute(submit_Numbers_URL);
+				}
 			}
 
 		}
