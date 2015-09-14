@@ -86,7 +86,7 @@ public class FightModeGame extends Activity {
 
 	//private final String get_user_ID_URL = "";
 	private final String server_domin = "http://118.166.88.157:3000/";
-	private final String post_ID_URL = server_domin + "postID";
+	private final String register_userID_URL = server_domin + "registerUserId";
 	private final String check_fetched_URL = server_domin + "checkFetched";
 	private final String check_table_URL = server_domin + "checkTable";
 	private final String submit_Numbers_URL = server_domin + "submitNumbers";
@@ -399,9 +399,9 @@ public class FightModeGame extends Activity {
 
 			String postData = "";
 			try{
-				if(post_ID_URL.equals(urls[0])){
+				if(register_userID_URL.equals(urls[0])){
 
-					// POSt ID
+					// Register user
 					postData = "UserID=" + myID + "&" + "RivalID=" + rivalID;
 				}
 				else if(check_fetched_URL.equals(urls[0])){
@@ -469,7 +469,7 @@ public class FightModeGame extends Activity {
 				else{
 
 					// keep posting ID
-					new makePostRequest().execute(post_ID_URL);
+					new makePostRequest().execute(register_userID_URL);
 				}
 			}
 			else if("checkPairState".equals(requestType)){
@@ -715,7 +715,7 @@ public class FightModeGame extends Activity {
 
 		Log.d(TAG, "jasper rival pin:" + rivalID);
 		startProgressBar();
-		new makePostRequest().execute(post_ID_URL);
+		new makePostRequest().execute(register_userID_URL);
 		//new checkPairTask().execute(check_fetched_URL);
 	}
 

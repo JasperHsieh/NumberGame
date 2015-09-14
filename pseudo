@@ -1,0 +1,72 @@
+***** stage one: show match dialog *****
+
+if( isOkToFindOpponent ){
+	register user through POST request
+}
+else{
+	inform user network unavailable (then go back to previous activity)
+	or improper rival ID (then show match dialog again)
+}
+
+***** stage two: pairing users *****
+
+if( register user success ){
+	if( check game match success ){
+		prepare game();
+		startgame();
+	}
+	else{
+		delay 500ms
+		check game match again
+	}
+}
+else{
+	register user again
+}
+
+***** stage three: start game *****
+
+*** resume state ***
+The resume state is the state that wait the user
+input number he guess, it will transfer to pause state
+if user press submit button
+
+*** pause state ***
+The pause state is the state that wait for the rival
+input number he guess, device will keep polling server
+for rival's numbers, it will transfer to resume state
+once user got rival's input number from server. 
+
+if( user is not first start ){
+	pause game
+	wait for rival
+	if(get rival's numbers){
+		resume game
+	}
+	else{
+		delay 500ms
+		get rival's numbers again
+	}
+}
+else{
+	resume game
+	user input numbers and submit
+	pause game
+	
+}
+
+***** game over *****
+
+if(user submit the numbers){
+	if(current number == target number){
+		POST to server
+	}
+
+}
+
+
+
+
+
+
+
