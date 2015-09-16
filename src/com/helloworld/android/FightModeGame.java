@@ -81,15 +81,17 @@ public class FightModeGame extends Activity {
 	private int focusColumn;
 	private String currentNumbers;
 	private String currentResult;
-	private ArrayList<Number> currentList;
+	private ArrayList<Number> currentNumberList;
 	private ArrayList<String> displayList;
 
 	//private final String get_user_ID_URL = "";
-	private final String server_domin = "http://118.166.88.157:3000/";
+	private final String server_domin = "http://61.228.176.237:3000/";
 	private final String register_userID_URL = server_domin + "registerUserId";
-	private final String check_fetched_URL = server_domin + "checkFetched";
+	private final String check_fetched_URL = server_domin + "checkPairState";
 	private final String check_table_URL = server_domin + "checkTable";
 	private final String submit_Numbers_URL = server_domin + "submitNumbers";
+
+	private int pincode_digit = 4;
 
 	// number object to store number and match level
 	// 0: no match anything
@@ -273,16 +275,16 @@ public class FightModeGame extends Activity {
 		focusColumn = 1;
 
 		// initial arraylist size=4
-		currentList = new ArrayList<Number>();
+		currentNumberList = new ArrayList<Number>();
 		for(int i=0; i<4; i++){
 			Number tmpNumber = new Number();
-			currentList.add(tmpNumber);
+			currentNumberList.add(tmpNumber);
 		}
 
 		displayList = new ArrayList<String>();
 
 		//myID = IdGenerater();
-		myID = "99999999";
+		myID = "9999";
 		rivalID = "00000000";
 		targetNumber = "";
 		getMatchDialog().show();
@@ -290,10 +292,11 @@ public class FightModeGame extends Activity {
 
 	private void prepareStartGame(JSONObject obj){
 
+		Log.d(TAG, "jasper prepareStartGame");
 		try{
 
-			targetNumber = obj.getString("targetNumber");
-			tableName = obj.getString("tableName");
+			targetNumber = obj.getString("TargetNumber");
+			tableName = obj.getString("TableName");
 
 		}catch(JSONException e){
 			Log.e(TAG, "jasper parse json failed:" + e);
@@ -303,11 +306,12 @@ public class FightModeGame extends Activity {
 	// start game
 	private void startGame(JSONObject obj){
 
+		Log.d(TAG, "jasper startGame");
 		boolean startFirst = false;
 
 		try{
 
-			startFirst = obj.getBoolean("startFirst");
+			startFirst = obj.getBoolean("StartFirst");
 			if(!startFirst){
 
 				disableUI();
@@ -325,6 +329,7 @@ public class FightModeGame extends Activity {
 
 	private void submitNumber(){
 
+		Log.d(TAG, "jasper submitNumber()");
 		setCurrentNumber();
 		//getCurrentNumber();
 		startCompare();
@@ -334,7 +339,7 @@ public class FightModeGame extends Activity {
 
 		currentNumbers = "";
 		for(int i=0; i<4; i++){
-			currentNumbers = currentNumbers + currentList.get(i).no;
+			currentNumbers = currentNumbers + currentNumberList.get(i).no;
 		}
 
 		String displayResult = currentNumbers + "    " + currentResult;
@@ -384,7 +389,7 @@ public class FightModeGame extends Activity {
 		Random r = new Random();
 		int rn = -1;
 		String ID = "";
-		for(int i=0; i<8; i++){
+		for(int i=0; i<pincode_digit; i++){
 			rn = r.nextInt(10);
 			ID += rn;
 
@@ -408,7 +413,7 @@ public class FightModeGame extends Activity {
 
 					// check pair state
 					try{
-						Thread.sleep(500);
+						Thread.sleep(3000);
 						postData = "PollingID=" + myID;
 					}catch(InterruptedException e){
 						Log.d(TAG, "jasper thread sleep exception:" + e);
@@ -419,7 +424,7 @@ public class FightModeGame extends Activity {
 					// check number table
 					try{
 						Thread.sleep(500);
-						postData = "UserID=" + myID + "&" + "table=" + tableName;
+						postData = "UserID=" + myID + "&" + "RivalID=" + "&" + "Table=" + tableName;
 					}catch(InterruptedException e){
 						Log.d(TAG, "jasper thread sleep exception:" + e);
 					}
@@ -429,7 +434,8 @@ public class FightModeGame extends Activity {
 
 					// submit user input numbers to server
 					postData = "UserID=" + myID + "&" + "guessNumber=" + currentNumbers
-								+ "&" + "guestResult=" + currentResult;
+								+ "&" + "guestResult=" + currentResult
+								+ "&" + "Table=" + tableName;
 				}
 
 				return postRequest(urls[0], postData);
@@ -452,23 +458,25 @@ public class FightModeGame extends Activity {
 			String requestResult = "";
 
 			try{
-				requestType = Jobj.getString("postType");
-				requestResult = Jobj.getString("result");
+				requestType = Jobj.getString("PostType");
+				requestResult = Jobj.getString("Result");
 			}catch(JSONException e){
 				Log.d(TAG, "jasper json parse exception:" + e);
 			}
 
-			if("postID".equals(requestType)){
+			if("registerUserId".equals(requestType)){
 
 				// handle post ID request return
 				if("Success".equals(requestResult)){
 
 					// start to check pair state
+					Log.d(TAG, "jasper registerUserId return SUCCESS");
 					new makePostRequest().execute(check_fetched_URL);
 				}
 				else{
 
 					// keep posting ID
+					Log.d(TAG, "jasper registerUserId return FAIL");
 					new makePostRequest().execute(register_userID_URL);
 				}
 			}
@@ -478,7 +486,8 @@ public class FightModeGame extends Activity {
 				if("Success".equals(requestResult)){
 
 					// Rival found, ready to start game
-					Log.d(TAG, "jasper rival found, ready to start game");
+					Log.d(TAG, "jasper checkPairState return SUCCESS");
+					//Log.d(TAG, "jasper rival found, ready to start game");
 					Toast.makeText(getApplicationContext(), "Rival found, ready to start game", Toast.LENGTH_LONG).show();
 					prepareStartGame(Jobj);
 					startGame(Jobj);
@@ -486,6 +495,7 @@ public class FightModeGame extends Activity {
 				else{
 
 					// keep checking pair state
+					Log.d(TAG, "jasper checkPairState return FAIL");
 					new makePostRequest().execute(check_fetched_URL);
 
 				}
@@ -495,11 +505,13 @@ public class FightModeGame extends Activity {
 				// handle check number table request return
 				if("Success".equals(requestResult)){
 
+					Log.d(TAG, "jasper checkTable return SUCCESS");
 					resumeGame();
 				}
 				else{
 
 					// keep checking table numbers
+					Log.d(TAG, "jasper checkTable return FAIL");
 					new makePostRequest().execute(check_table_URL);
 				}
 
@@ -508,11 +520,13 @@ public class FightModeGame extends Activity {
 
 				if("Success". equals(requestResult)){
 
+					Log.d(TAG, "jasper submitNumbers return SUCCESS");
 					pauseGame();
 				}
 				else{
 
 					// submit again
+					Log.d(TAG, "jasper submitNumbers return FAIL");
 					new makePostRequest().execute(submit_Numbers_URL);
 				}
 			}
@@ -554,7 +568,7 @@ public class FightModeGame extends Activity {
 					response+=line;
 				}
 
-				Log.d(TAG, "jasper reponse:" + response);
+				Log.d(TAG, "jasper response:" + response);
 
 				return response;
 
@@ -769,11 +783,11 @@ public class FightModeGame extends Activity {
 
 		for(int i=0; i<4; i++){
 
-			if(currentList.get(i).match == 1){
+			if(currentNumberList.get(i).match == 1){
 
 				B_number++;
 			}
-			else if(currentList.get(i).match == 2){
+			else if(currentNumberList.get(i).match == 2){
 
 				A_number++;
 			}
@@ -786,7 +800,7 @@ public class FightModeGame extends Activity {
 
 		// reset current number list match flag
 		for(int i=0; i<4; i++){
-			currentList.get(i).match = 0;
+			currentNumberList.get(i).match = 0;
 		}
 
 		// initial target number set
@@ -801,19 +815,19 @@ public class FightModeGame extends Activity {
 		// start to compare
 		for(int i=0; i<4; i++){
 
-			if(currentList.get(i).no == targetNumber.charAt(i)){
+			if(currentNumberList.get(i).no == targetNumber.charAt(i)){
 				// match number and posistion
-				currentList.get(i).match = 2;
+				currentNumberList.get(i).match = 2;
 			}
-			else if(mTargetNumbersSet.contains(currentList.get(i).no)){
+			else if(mTargetNumbersSet.contains(currentNumberList.get(i).no)){
 				// match number only
-				currentList.get(i).match = 1;
+				currentNumberList.get(i).match = 1;
 			}
 
 		}
 
 		for(int i=0; i<4; i++){
-			Log.d(TAG, "jasper " + currentList.get(i).no + ":" + currentList.get(i).match);
+			Log.d(TAG, "jasper " + currentNumberList.get(i).no + ":" + currentNumberList.get(i).match);
 		}
 
 	}
@@ -847,17 +861,17 @@ public class FightModeGame extends Activity {
 		for(int i=0; i<4; i++){
 
 			//Log.d(TAG,"jasper add:" + getFocusColumn(i+1).getText().toString());
-			currentList.get(i).no = getFocusColumn(i+1).getText().toString().charAt(0);
+			currentNumberList.get(i).no = getFocusColumn(i+1).getText().toString().charAt(0);
 		}
 	}
 
 	private void getCurrentNumber(){
 
-		Log.d(TAG, "jasper currentList:"
-			+ currentList.get(0).no
-			+ currentList.get(1).no
-			+ currentList.get(2).no
-			+ currentList.get(3).no);
+		Log.d(TAG, "jasper currentNumberList:"
+			+ currentNumberList.get(0).no
+			+ currentNumberList.get(1).no
+			+ currentNumberList.get(2).no
+			+ currentNumberList.get(3).no);
 	}
 
 	private void focusNext(){

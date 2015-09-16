@@ -9,11 +9,11 @@ server side
 
 JSON
 
-/postID
+/registerUserId
 requestType
 requestResult
 
-/pollingID
+/checkpairState
 requestType
 requestResult
 targetNumber
