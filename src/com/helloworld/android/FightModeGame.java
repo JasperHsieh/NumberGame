@@ -793,6 +793,7 @@ public class FightModeGame extends Activity {
 		RelativeLayout progressbar_container = (RelativeLayout)mProgressBar.getParent();
 		progressbar_container.setVisibility(View.GONE);
 
+		// set container of listview visible
 		RelativeLayout listview_container = (RelativeLayout)resultList.getParent();
 		listview_container.setVisibility(View.VISIBLE);
 
