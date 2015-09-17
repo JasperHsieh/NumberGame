@@ -13,6 +13,9 @@ import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+import android.widget.LinearLayout.LayoutParams;
+import android.widget.RelativeLayout;
+//import android.widget.RelativeLayout.LayoutParams;
 import android.view.WindowManager;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -83,9 +86,10 @@ public class FightModeGame extends Activity {
 	private String currentResult;
 	private ArrayList<Number> currentNumberList;
 	private ArrayList<String> displayList;
+	private ResultAdapter mAdapter;
 
 	//private final String get_user_ID_URL = "";
-	private final String server_domin = "http://61.228.176.237:3000/";
+	private final String server_domin = "http://118.165.42.63:3000/";
 	private final String register_userID_URL = server_domin + "registerUserId";
 	private final String check_fetched_URL = server_domin + "checkPairState";
 	private final String check_table_URL = server_domin + "checkTable";
@@ -282,6 +286,8 @@ public class FightModeGame extends Activity {
 		}
 
 		displayList = new ArrayList<String>();
+		mAdapter = new ResultAdapter(this, displayList);
+		resultList.setAdapter(mAdapter);
 
 		//myID = IdGenerater();
 		myID = "9999";
@@ -308,7 +314,7 @@ public class FightModeGame extends Activity {
 
 		Log.d(TAG, "jasper startGame");
 		boolean startFirst = false;
-
+		resultList.setVisibility(View.VISIBLE);
 		try{
 
 			startFirst = obj.getBoolean("StartFirst");
@@ -335,16 +341,17 @@ public class FightModeGame extends Activity {
 		startCompare();
 		currentResult = getCompareResult();
 
-		Log.d(TAG, "jasper " + currentResult);
+		Log.d(TAG, "jasper currentResult:" + currentResult);
 
 		currentNumbers = "";
 		for(int i=0; i<4; i++){
 			currentNumbers = currentNumbers + currentNumberList.get(i).no;
 		}
 
-		String displayResult = currentNumbers + "    " + currentResult;
-		displayList.add(displayResult);
-		setListView();
+		String myResult = currentNumbers + "    " + currentResult;
+		//displayList.add(displayResult);
+		//setListView();
+		updateListView(myResult);
 
 		new makePostRequest().execute(submit_Numbers_URL);
 	}
@@ -407,11 +414,13 @@ public class FightModeGame extends Activity {
 				if(register_userID_URL.equals(urls[0])){
 
 					// Register user
+					Log.d(TAG, "jasper registerUserId request");
 					postData = "UserID=" + myID + "&" + "RivalID=" + rivalID;
 				}
 				else if(check_fetched_URL.equals(urls[0])){
 
 					// check pair state
+					Log.d(TAG, "jasper checkPairState request");
 					try{
 						Thread.sleep(3000);
 						postData = "PollingID=" + myID;
@@ -422,9 +431,10 @@ public class FightModeGame extends Activity {
 				else if(check_table_URL.equals(urls[0])){
 
 					// check number table
+					Log.d(TAG, "jasper checkTable request");
 					try{
-						Thread.sleep(500);
-						postData = "UserID=" + myID + "&" + "RivalID=" + "&" + "Table=" + tableName;
+						Thread.sleep(3000);
+						postData = "UserID=" + myID + "&" + "RivalID=" + rivalID + "&" + "Table=" + tableName;
 					}catch(InterruptedException e){
 						Log.d(TAG, "jasper thread sleep exception:" + e);
 					}
@@ -433,11 +443,13 @@ public class FightModeGame extends Activity {
 				else if(submit_Numbers_URL.equals(urls[0])){
 
 					// submit user input numbers to server
+					Log.d(TAG, "jasper submitNumbers request");
 					postData = "UserID=" + myID + "&" + "guessNumber=" + currentNumbers
-								+ "&" + "guestResult=" + currentResult
+								+ "&" + "guessResult=" + currentResult
 								+ "&" + "Table=" + tableName;
 				}
 
+				Log.d(TAG, "jasper postData:" + postData);
 				return postRequest(urls[0], postData);
 			}
 			catch(IOException e){
@@ -453,9 +465,13 @@ public class FightModeGame extends Activity {
 			// check request type first
 			// POST ID till success, and then keep polling the fetch state
 
+			if(result == null){
+				Log.d(TAG, "jasper server not response, returne null");
+				return;
+			}
 			JSONObject Jobj = stringToJson(result);
-			String requestType = "";
-			String requestResult = "";
+			String requestType = "hahaha";
+			String requestResult = "Fail";
 
 			try{
 				requestType = Jobj.getString("PostType");
@@ -490,6 +506,7 @@ public class FightModeGame extends Activity {
 					//Log.d(TAG, "jasper rival found, ready to start game");
 					Toast.makeText(getApplicationContext(), "Rival found, ready to start game", Toast.LENGTH_LONG).show();
 					prepareStartGame(Jobj);
+					stopProgressBar();
 					startGame(Jobj);
 				}
 				else{
@@ -506,6 +523,13 @@ public class FightModeGame extends Activity {
 				if("Success".equals(requestResult)){
 
 					Log.d(TAG, "jasper checkTable return SUCCESS");
+					String rivalResult = "";
+					try{
+						rivalResult = Jobj.getString("RivalNumbers") + "    " + Jobj.getString("RivalResult");
+					}catch(JSONException e){
+						Log.d(TAG, "jasper json parse exception:" + e);	
+					}
+					updateListView(rivalResult);
 					resumeGame();
 				}
 				else{
@@ -516,7 +540,7 @@ public class FightModeGame extends Activity {
 				}
 
 			}
-			else if("submitNumbers".equals(requestResult)){
+			else if("submitNumbers".equals(requestType)){
 
 				if("Success". equals(requestResult)){
 
@@ -530,13 +554,16 @@ public class FightModeGame extends Activity {
 					new makePostRequest().execute(submit_Numbers_URL);
 				}
 			}
+			else{
+				Log.d(TAG, "jasper improper reqestType:" + requestType);
+			}
 
 		}
 	}
 
 	private String postRequest(String myurl, String postData) throws IOException{
 		
-		Log.d(TAG, "jasper postID");
+		Log.d(TAG, "jasper postRequest");
 		int len = 500;
 		String response = "";
 
@@ -761,15 +788,39 @@ public class FightModeGame extends Activity {
 
 		Log.d(TAG, "jasper stop progress bar");
 		mProgressBar.setVisibility(View.GONE);
+
+		// set container of progressbar gone
+		RelativeLayout progressbar_container = (RelativeLayout)mProgressBar.getParent();
+		progressbar_container.setVisibility(View.GONE);
+
+		RelativeLayout listview_container = (RelativeLayout)resultList.getParent();
+		listview_container.setVisibility(View.VISIBLE);
+
 	}
 
+	private void updateListView(String result){
+
+		displayList.add(result);
+		mAdapter.notifyDataSetChanged();
+
+		// limit the size of ListView be 5
+		if(mAdapter.getCount()>5){
+
+			View item = mAdapter.getView(0, null, resultList);
+			item.measure(0, 0);
+			RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, (int) (5.5 * item.getMeasuredHeight()));
+			resultList.setLayoutParams(params);
+		}
+
+	}
+/*
 	private void setListView(){
 
 		ResultAdapter mAdapter = new ResultAdapter(this, displayList);
 		resultList.setAdapter(mAdapter);
 		resultList.setSelection(resultList.getAdapter().getCount()-1);
 	}
-
+*/
 	private void cleanup(){
 
 		displayList.clear();
