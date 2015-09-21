@@ -57,6 +57,7 @@ public class FightModeGame extends Activity {
 	private int check_retry = 0;
 	private String tableName;
 	private String targetNumber;
+	private String isFirst;
 
 	private Button ok_btn;
 
@@ -89,7 +90,7 @@ public class FightModeGame extends Activity {
 	private ResultAdapter mAdapter;
 
 	//private final String get_user_ID_URL = "";
-	private final String server_domin = "http://118.165.42.63:3000/";
+	private final String server_domin = "http://61.228.216.250:3000/";
 	private final String register_userID_URL = server_domin + "registerUserId";
 	private final String check_fetched_URL = server_domin + "checkPairState";
 	private final String check_table_URL = server_domin + "checkTable";
@@ -299,13 +300,20 @@ public class FightModeGame extends Activity {
 	private void prepareStartGame(JSONObject obj){
 
 		Log.d(TAG, "jasper prepareStartGame");
-		try{
 
-			targetNumber = obj.getString("TargetNumber");
-			tableName = obj.getString("TableName");
+		if(obj != null){
 
-		}catch(JSONException e){
-			Log.e(TAG, "jasper parse json failed:" + e);
+			try{
+
+				targetNumber = obj.getString("TargetNumber");
+				tableName = obj.getString("TableName");
+
+			}catch(JSONException e){
+				Log.e(TAG, "jasper parse json failed:" + e);
+			}
+		}
+		else{
+			Log.d(TAG, "jasper obj is NULL");
 		}
 	}
 
@@ -315,21 +323,17 @@ public class FightModeGame extends Activity {
 		Log.d(TAG, "jasper startGame");
 		boolean startFirst = false;
 		resultList.setVisibility(View.VISIBLE);
-		try{
 
-			startFirst = obj.getBoolean("StartFirst");
-			if(!startFirst){
+		if(!isFirst(tableName)){
 
-				disableUI();
-				pauseGame();
-			}
-			else{
+			Log.d(TAG, "jasper not FIRST");
+			disableUI();
+			pauseGame();
+		}
+		else{
 
-				resumeGame();
-			}
-		}catch(JSONException e){
-
-			Log.e(TAG, "jasper parse json failed:" + e);
+			Log.d(TAG, "jasper FIRST");
+			resumeGame();
 		}
 	}
 
@@ -434,7 +438,7 @@ public class FightModeGame extends Activity {
 					Log.d(TAG, "jasper checkTable request");
 					try{
 						Thread.sleep(3000);
-						postData = "UserID=" + myID + "&" + "RivalID=" + rivalID + "&" + "Table=" + tableName;
+						postData = "UserID=" + myID + "&" + "RivalID=" + rivalID + "&" +													"Table=" + tableName;
 					}catch(InterruptedException e){
 						Log.d(TAG, "jasper thread sleep exception:" + e);
 					}
@@ -473,11 +477,14 @@ public class FightModeGame extends Activity {
 			String requestType = "hahaha";
 			String requestResult = "Fail";
 
-			try{
-				requestType = Jobj.getString("PostType");
-				requestResult = Jobj.getString("Result");
-			}catch(JSONException e){
-				Log.d(TAG, "jasper json parse exception:" + e);
+			if(Jobj != null){
+
+				try{
+					requestType = Jobj.getString("PostType");
+					requestResult = Jobj.getString("Result");
+				}catch(JSONException e){
+					Log.d(TAG, "jasper json parse exception:" + e);
+				}
 			}
 
 			if("registerUserId".equals(requestType)){
@@ -529,7 +536,11 @@ public class FightModeGame extends Activity {
 					}catch(JSONException e){
 						Log.d(TAG, "jasper json parse exception:" + e);	
 					}
-					updateListView(rivalResult);
+
+					// prevent update initial data in database to ListView
+					if(!"0000    0A0B".equals(rivalResult)){
+						updateListView(rivalResult);
+					}
 					resumeGame();
 				}
 				else{
@@ -605,7 +616,7 @@ public class FightModeGame extends Activity {
 				throw new Exception();
 			}
 		}catch(Exception e){
-			Log.d(TAG, "jasper post exception" + e);
+			Log.d(TAG, "jasper post exception:" + e);
 			e.printStackTrace();
 			return "Exception happened";
 		}
@@ -880,6 +891,27 @@ public class FightModeGame extends Activity {
 
 		for(int i=0; i<4; i++){
 			Log.d(TAG, "jasper " + currentNumberList.get(i).no + ":" + currentNumberList.get(i).match);
+		}
+
+	}
+
+	// Parse table name
+	private boolean isFirst(String table_name){
+
+		if(table_name != null){
+
+			String[] tmpArray = table_name.split("_");
+			int tmpLength = tmpArray.length;
+			Log.d(TAG, "jasper table array:" + tmpArray[0] + " " + tmpArray[1] + " " + tmpArray[2]);
+
+			if(myID.equals(tmpArray[1])){
+				return true;
+			}
+			return false;
+		}
+		else{
+			Log.d(TAG, "jasper table_name is null");
+			return false;
 		}
 
 	}
