@@ -12,4 +12,7 @@
     <color name="cyan">#FF00FFFF</color>
     <color name="magenta">#FFFF00FF</color>
     <color name="transparent">#00000000</color>
+	<color name="main_layout">#e08f6f</color>
+	<color name="list_view">#ffd700</color>
+
 </resources>

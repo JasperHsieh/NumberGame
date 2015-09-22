@@ -115,7 +115,6 @@ public class LevelModeGame extends Activity {
 		number_4 = (TextView)findViewById(R.id.number4);
 
 		ok_btn = (Button)findViewById(R.id.go);
-		reset_btn = (Button)findViewById(R.id.reset);
 
 		one_btn = (Button)findViewById(R.id.one);
 		two_btn = (Button)findViewById(R.id.two);
@@ -135,7 +134,6 @@ public class LevelModeGame extends Activity {
 		number_4.setOnClickListener(mColumnListener);
 
 		ok_btn.setOnClickListener(mListener);
-		reset_btn.setOnClickListener(mListener);
 
 		one_btn.setOnClickListener(mNumberListener);
 		two_btn.setOnClickListener(mNumberListener);
@@ -407,7 +405,7 @@ public class LevelModeGame extends Activity {
 		
 		
 		if(getFocusColumn(column) != null){
-			getFocusColumn(column).setBackgroundResource(R.drawable.border);
+			getFocusColumn(column).setBackgroundResource(R.drawable.focus_grid);
 		}
 		focusColumn = column;
 
@@ -419,7 +417,7 @@ public class LevelModeGame extends Activity {
 		if(focusColumn != column)return;
 		
 		if(getFocusColumn(column) != null){
-			getFocusColumn(column).setBackgroundResource(0);
+			getFocusColumn(column).setBackgroundResource(R.drawable.unfocus_grid);
 		}
 	}
 
