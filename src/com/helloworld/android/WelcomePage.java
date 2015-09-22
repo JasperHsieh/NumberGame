@@ -18,6 +18,7 @@ public class WelcomePage extends Activity {
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState){
+
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.welcome);
 
@@ -38,6 +39,7 @@ public class WelcomePage extends Activity {
 				
 				case R.id.level_mode:
 					Log.d(TAG, "jasper level mode button");
+					startLevelModeActivity();
 					break;
 				case R.id.fight_mode:
 					Log.d(TAG, "jasper fight mode button");
@@ -53,6 +55,11 @@ public class WelcomePage extends Activity {
 		startActivity(intent);
 	}
 
+	private void startLevelModeActivity(){
+
+		Intent intent = new Intent(this, LevelModeGame.class);
+		startActivity(intent);
+	}
 
 
 

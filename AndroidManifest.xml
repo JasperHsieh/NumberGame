@@ -21,6 +21,9 @@
 		<activity
 			android:name=".FightModeGame">
 		</activity>
+		<activity
+			android:name=".LevelModeGame">
+		</activity>
     </application>
 
 </manifest>
