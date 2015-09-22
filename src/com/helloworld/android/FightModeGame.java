@@ -816,6 +816,7 @@ public class FightModeGame extends Activity {
 		mAdapter.notifyDataSetChanged();
 
 		// limit the size of ListView be 5
+		/*
 		if(mAdapter.getCount()>5){
 
 			View item = mAdapter.getView(0, null, resultList);
@@ -823,6 +824,7 @@ public class FightModeGame extends Activity {
 			RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, (int) (5.5 * item.getMeasuredHeight()));
 			resultList.setLayoutParams(params);
 		}
+		*/
 
 	}
 /*
