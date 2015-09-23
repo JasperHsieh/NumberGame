@@ -290,8 +290,8 @@ public class FightModeGame extends Activity {
 		mAdapter = new ResultAdapter(this, displayList);
 		resultList.setAdapter(mAdapter);
 
-		//myID = IdGenerater();
-		myID = "9999";
+		myID = IdGenerater();
+		//myID = "9999";
 		rivalID = "00000000";
 		targetNumber = "";
 		getMatchDialog().show();
@@ -353,9 +353,12 @@ public class FightModeGame extends Activity {
 		}
 
 		String myResult = currentNumbers + "    " + currentResult;
-		//displayList.add(displayResult);
-		//setListView();
+
 		updateListView(myResult);
+
+		if("4A0B".equals(currentResult)){
+			//handleWinner();
+		}
 
 		new makePostRequest().execute(submit_Numbers_URL);
 	}
@@ -438,7 +441,7 @@ public class FightModeGame extends Activity {
 					Log.d(TAG, "jasper checkTable request");
 					try{
 						Thread.sleep(3000);
-						postData = "UserID=" + myID + "&" + "RivalID=" + rivalID + "&" +													"Table=" + tableName;
+						postData = "UserID=" + myID + "&" + "RivalID=" + rivalID + "&" + "Table=" + tableName;
 					}catch(InterruptedException e){
 						Log.d(TAG, "jasper thread sleep exception:" + e);
 					}
@@ -537,11 +540,9 @@ public class FightModeGame extends Activity {
 						Log.d(TAG, "jasper json parse exception:" + e);	
 					}
 
-					// prevent update initial data in database to ListView
-					if(!"0000    0A0B".equals(rivalResult)){
-						updateListView(rivalResult);
-					}
+					updateListView(rivalResult);
 					resumeGame();
+
 				}
 				else{
 
