@@ -337,6 +337,24 @@ public class FightModeGame extends Activity {
 		}
 	}
 
+	private void handleWinner(){
+
+		Log.d(TAG, "jasper WINNER");
+		String title = "You win";
+		String msg = "YOU WIN";
+		myAlertDialog(title, msg).show();
+
+	}
+
+	private void handleLoser(){
+
+		Log.d(TAG, "jasper LOSER");
+		String title = "You lose";
+		String msg = "YOU LOSE";
+		myAlertDialog(title, msg).show();
+
+	}
+
 	private void submitNumber(){
 
 		Log.d(TAG, "jasper submitNumber()");
@@ -357,7 +375,7 @@ public class FightModeGame extends Activity {
 		updateListView(myResult);
 
 		if("4A0B".equals(currentResult)){
-			//handleWinner();
+			handleWinner();
 		}
 
 		new makePostRequest().execute(submit_Numbers_URL);
@@ -533,15 +551,24 @@ public class FightModeGame extends Activity {
 				if("Success".equals(requestResult)){
 
 					Log.d(TAG, "jasper checkTable return SUCCESS");
+					String rivalStr = "";
 					String rivalResult = "";
+
 					try{
-						rivalResult = Jobj.getString("RivalNumbers") + "    " + Jobj.getString("RivalResult");
+						rivalStr = Jobj.getString("RivalNumbers") + "    " + Jobj.getString("RivalResult");
+						rivalResult = Jobj.getString("RivalResult");
 					}catch(JSONException e){
 						Log.d(TAG, "jasper json parse exception:" + e);	
 					}
 
-					updateListView(rivalResult);
-					resumeGame();
+					updateListView(rivalStr);
+
+					if(!"4A0B".equals(rivalResult)){
+						resumeGame();
+					}
+					else{
+						handleLoser();
+					}
 
 				}
 				else{
@@ -692,7 +719,18 @@ public class FightModeGame extends Activity {
 					public void onClick(DialogInterface dialog, int id){
 
 						Log.d(TAG, "jasper no network click");
-						if("No Network Connection".equals(title)){
+
+						String netWorkProblem = "No Network Connection";
+						String Win = "You win";
+						String Lose = "You lose";
+
+						if(netWorkProblem.equals(title)){
+							finish();
+						}
+						else if(Win.equals(title)){
+							finish();
+						}
+						else if(Lose.equals(title)){
 							finish();
 						}
 						else if("Improper ID".equals(title)){
