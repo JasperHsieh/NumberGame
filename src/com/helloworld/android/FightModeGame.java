@@ -89,7 +89,6 @@ public class FightModeGame extends Activity {
 	private ArrayList<String> displayList;
 	private ResultAdapter mAdapter;
 
-	//private final String get_user_ID_URL = "";
 	private final String server_domin = "http://61.228.179.114:3000/";
 	private final String register_userID_URL = server_domin + "registerUserId";
 	private final String check_fetched_URL = server_domin + "checkPairState";
@@ -97,6 +96,8 @@ public class FightModeGame extends Activity {
 	private final String submit_Numbers_URL = server_domin + "submitNumbers";
 
 	private int pincode_digit = 4;
+	private boolean taskRunnable = false;
+	private boolean gameOver = true;
 
 	// number object to store number and match level
 	// 0: no match anything
@@ -223,7 +224,6 @@ public class FightModeGame extends Activity {
 		Log.d(TAG, "jasper onCreate");
 		// set layout and get view
         setContentView(R.layout.fightmode);
-		
 		setMyView();
 		initialGame();
 	}
@@ -290,11 +290,15 @@ public class FightModeGame extends Activity {
 		mAdapter = new ResultAdapter(this, displayList);
 		resultList.setAdapter(mAdapter);
 
+		gameOver = false;
+		setTaskRunnable(true);
+
 		myID = IdGenerater();
 		//myID = "9999";
 		rivalID = "00000000";
 		targetNumber = "";
 		getMatchDialog().show();
+
 	}
 
 	private void prepareStartGame(JSONObject obj){
@@ -340,6 +344,9 @@ public class FightModeGame extends Activity {
 	private void handleWinner(){
 
 		Log.d(TAG, "jasper WINNER");
+
+		gameOver = true;
+
 		String title = "You win";
 		String msg = "YOU WIN";
 		myAlertDialog(title, msg).show();
@@ -374,11 +381,12 @@ public class FightModeGame extends Activity {
 
 		updateListView(myResult);
 
+		new MakePostRequestTask().execute(submit_Numbers_URL);
+
 		if("4A0B".equals(currentResult)){
 			handleWinner();
 		}
 
-		new makePostRequest().execute(submit_Numbers_URL);
 	}
 
 	private void resumeGame(){
@@ -389,7 +397,7 @@ public class FightModeGame extends Activity {
 	private void pauseGame(){
 
 		disableUI();
-		new makePostRequest().execute(check_table_URL);
+		new MakePostRequestTask().execute(check_table_URL);
 	}
 
 	private void enableUI(){
@@ -430,58 +438,60 @@ public class FightModeGame extends Activity {
 	}
 
 	// Async task for making POST request
-	private class makePostRequest extends AsyncTask<String, Void, String>{
+	private class MakePostRequestTask extends AsyncTask<String, Void, String>{
 
 		protected String doInBackground(String... urls){
 
 			String postData = "";
-			try{
-				if(register_userID_URL.equals(urls[0])){
 
-					// Register user
-					Log.d(TAG, "jasper registerUserId request");
-					postData = "UserID=" + myID + "&" + "RivalID=" + rivalID;
-				}
-				else if(check_fetched_URL.equals(urls[0])){
+			if(isTaskRunnable()){
 
-					// check pair state
-					Log.d(TAG, "jasper checkPairState request");
-					try{
-						Thread.sleep(3000);
-						postData = "PollingID=" + myID;
-					}catch(InterruptedException e){
-						Log.d(TAG, "jasper thread sleep exception:" + e);
+				try{
+					if(register_userID_URL.equals(urls[0])){
+
+						// Register user
+						Log.d(TAG, "jasper registerUserId request");
+						postData = "UserID=" + myID + "&" + "RivalID=" + rivalID;
 					}
-				}
-				else if(check_table_URL.equals(urls[0])){
+					else if(check_fetched_URL.equals(urls[0])){
 
-					// check number table
-					Log.d(TAG, "jasper checkTable request");
-					try{
-						Thread.sleep(3000);
-						postData = "UserID=" + myID + "&" + "RivalID=" + rivalID + "&" + "Table=" + tableName;
-					}catch(InterruptedException e){
-						Log.d(TAG, "jasper thread sleep exception:" + e);
+						// check pair state
+						Log.d(TAG, "jasper checkPairState request");
+						try{
+							Thread.sleep(3000);
+							postData = "PollingID=" + myID;
+						}catch(InterruptedException e){
+							Log.d(TAG, "jasper thread sleep exception:" + e);
+						}
+					}
+					else if(check_table_URL.equals(urls[0])){
+
+						// check number table
+						Log.d(TAG, "jasper checkTable request");
+						try{
+							Thread.sleep(3000);
+							postData = "UserID=" + myID + "&" + "RivalID=" + rivalID + "&" + "Table=" + tableName;
+						}catch(InterruptedException e){
+							Log.d(TAG, "jasper thread sleep exception:" + e);
+						}
+
+					}
+					else if(submit_Numbers_URL.equals(urls[0])){
+
+						// submit user input numbers to server
+						Log.d(TAG, "jasper submitNumbers request");
+						postData = "UserID=" + myID + "&" + "guessNumber=" + currentNumbers
+									+ "&" + "guessResult=" + currentResult
+									+ "&" + "Table=" + tableName;
 					}
 
+					Log.d(TAG, "jasper postData:" + postData);
+					return postRequest(urls[0], postData);
 				}
-				else if(submit_Numbers_URL.equals(urls[0])){
-
-					// submit user input numbers to server
-					Log.d(TAG, "jasper submitNumbers request");
-					postData = "UserID=" + myID + "&" + "guessNumber=" + currentNumbers
-								+ "&" + "guessResult=" + currentResult
-								+ "&" + "Table=" + tableName;
+				catch(IOException e){
+					Log.d(TAG, "jasper unable to retrieve the URL :" + e);
 				}
-
-				Log.d(TAG, "jasper postData:" + postData);
-				return postRequest(urls[0], postData);
 			}
-			catch(IOException e){
-
-				Log.d(TAG, "jasper unable to retrieve the URL :" + e);
-			}
-
 			return "test";
 		}
 
@@ -515,13 +525,13 @@ public class FightModeGame extends Activity {
 
 					// start to check pair state
 					Log.d(TAG, "jasper registerUserId return SUCCESS");
-					new makePostRequest().execute(check_fetched_URL);
+					new MakePostRequestTask().execute(check_fetched_URL);
 				}
 				else{
 
 					// keep posting ID
 					Log.d(TAG, "jasper registerUserId return FAIL");
-					new makePostRequest().execute(register_userID_URL);
+					new MakePostRequestTask().execute(register_userID_URL);
 				}
 			}
 			else if("checkPairState".equals(requestType)){
@@ -541,7 +551,7 @@ public class FightModeGame extends Activity {
 
 					// keep checking pair state
 					Log.d(TAG, "jasper checkPairState return FAIL");
-					new makePostRequest().execute(check_fetched_URL);
+					new MakePostRequestTask().execute(check_fetched_URL);
 
 				}
 			}
@@ -575,7 +585,7 @@ public class FightModeGame extends Activity {
 
 					// keep checking table numbers
 					Log.d(TAG, "jasper checkTable return FAIL");
-					new makePostRequest().execute(check_table_URL);
+					new MakePostRequestTask().execute(check_table_URL);
 				}
 
 			}
@@ -585,12 +595,16 @@ public class FightModeGame extends Activity {
 
 					Log.d(TAG, "jasper submitNumbers return SUCCESS");
 					pauseGame();
+
+					if(gameOver){
+						setTaskRunnable(false);
+					}
 				}
 				else{
 
 					// submit again
 					Log.d(TAG, "jasper submitNumbers return FAIL");
-					new makePostRequest().execute(submit_Numbers_URL);
+					new MakePostRequestTask().execute(submit_Numbers_URL);
 				}
 			}
 			else{
@@ -806,7 +820,7 @@ public class FightModeGame extends Activity {
 
 		Log.d(TAG, "jasper rival pin:" + rivalID);
 		startProgressBar();
-		new makePostRequest().execute(register_userID_URL);
+		new MakePostRequestTask().execute(register_userID_URL);
 		//new checkPairTask().execute(check_fetched_URL);
 	}
 
@@ -826,6 +840,16 @@ public class FightModeGame extends Activity {
 			return false;
 		}
 
+	}
+
+	private void setTaskRunnable(boolean result){
+
+		taskRunnable = result;
+	}
+
+	private boolean isTaskRunnable(){
+
+		return taskRunnable;
 	}
 
 	private void startProgressBar(){
