@@ -1070,7 +1070,7 @@ public class FightModeGame extends Activity {
 		
 		
 		if(getFocusColumn(column) != null){
-			getFocusColumn(column).setBackgroundResource(R.drawable.border);
+			getFocusColumn(column).setBackgroundResource(R.drawable.focus_grid);
 		}
 		focusColumn = column;
 
@@ -1082,7 +1082,7 @@ public class FightModeGame extends Activity {
 		if(focusColumn != column)return;
 		
 		if(getFocusColumn(column) != null){
-			getFocusColumn(column).setBackgroundResource(0);
+			getFocusColumn(column).setBackgroundResource(R.drawable.unfocus_grid);
 		}
 	}
 
