@@ -142,6 +142,7 @@ public class FightModeGame extends Activity {
 		@Override
 		public void onClick(View view){
 
+			pauseGame();
 			submitNumber();
 		}
 	};
@@ -337,6 +338,7 @@ public class FightModeGame extends Activity {
 			Log.d(TAG, "jasper not FIRST");
 			disableUI();
 			pauseGame();
+			new MakePostRequestTask().execute(check_table_URL);
 		}
 		else{
 
@@ -401,7 +403,6 @@ public class FightModeGame extends Activity {
 	private void pauseGame(){
 
 		disableUI();
-		new MakePostRequestTask().execute(check_table_URL);
 	}
 
 	private void enableUI(){
@@ -418,6 +419,7 @@ public class FightModeGame extends Activity {
 
 		if(btn != null){
 			btn.setBackgroundResource(R.drawable.enable_ok_button_shape);
+			btn.setClickable(true);
 		}
 	}
 
@@ -425,6 +427,7 @@ public class FightModeGame extends Activity {
 
 		if(btn != null){
 			btn.setBackgroundResource(R.drawable.disable_ok_button_shape);
+			btn.setClickable(false);
 		}
 	}
 
@@ -598,7 +601,8 @@ public class FightModeGame extends Activity {
 				if("Success". equals(requestResult)){
 
 					Log.d(TAG, "jasper submitNumbers return SUCCESS");
-					pauseGame();
+
+					new MakePostRequestTask().execute(check_table_URL);
 
 					if(gameOver){
 						setTaskRunnable(false);
