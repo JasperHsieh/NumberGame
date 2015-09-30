@@ -355,7 +355,7 @@ public class FightModeGame extends Activity {
 
 		String title = "You win";
 		String msg = "YOU WIN";
-		myAlertDialog(title, msg).show();
+		showAlertDialog(title, msg);
 
 	}
 
@@ -364,7 +364,7 @@ public class FightModeGame extends Activity {
 		Log.d(TAG, "jasper LOSER");
 		String title = "You lose";
 		String msg = "YOU LOSE";
-		myAlertDialog(title, msg).show();
+		showAlertDialog(title, msg);
 
 	}
 
@@ -728,6 +728,13 @@ public class FightModeGame extends Activity {
 
 	}
 
+	private void showAlertDialog(String title, String msg){
+
+		Dialog dialog = getAlertDialog(title, msg);
+		dialog.show();
+		dialog.setCanceledOnTouchOutside(false);
+	}
+
 	private void showMatchingDialog(){
 
 		Dialog dialog = getMatchDialog();
@@ -736,9 +743,9 @@ public class FightModeGame extends Activity {
 	}
 
 	// the dialog to inform user there is no network connection
-	private AlertDialog myAlertDialog(final String title, final String msg){
+	private AlertDialog getAlertDialog(final String title, final String msg){
 		
-		Log.d(TAG, "jaspe myAlertDialog");
+		Log.d(TAG, "jasper getAlertDialog");
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(title)
 				.setMessage(msg)
@@ -811,7 +818,7 @@ public class FightModeGame extends Activity {
 
 			title = "No Network Connection";
 			msg = "Please connect to the network";
-			myAlertDialog(title, msg).show();
+			showAlertDialog(title, msg);
 
 			return false;
 		}
@@ -820,7 +827,7 @@ public class FightModeGame extends Activity {
 
 				title = "Improper ID";
 				msg = "Please input 8 digits number";
-				myAlertDialog(title, msg).show();
+				showAlertDialog(title, msg);
 
 				return false;
 			}
