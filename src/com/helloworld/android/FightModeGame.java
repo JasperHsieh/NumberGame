@@ -302,7 +302,7 @@ public class FightModeGame extends Activity {
 		rivalID = "00000000";
 		targetNumber = "";
 		titleBar.setText("Your ID:" + myID);
-		getMatchDialog().show();
+		showMatchingDialog();
 
 	}
 
@@ -728,6 +728,13 @@ public class FightModeGame extends Activity {
 
 	}
 
+	private void showMatchingDialog(){
+
+		Dialog dialog = getMatchDialog();
+		dialog.show();
+		dialog.setCanceledOnTouchOutside(false);
+	}
+
 	// the dialog to inform user there is no network connection
 	private AlertDialog myAlertDialog(final String title, final String msg){
 		
@@ -756,7 +763,7 @@ public class FightModeGame extends Activity {
 							finish();
 						}
 						else if("Improper ID".equals(title)){
-							getMatchDialog().show();
+							showMatchingDialog();
 						}
 					}
 				});
