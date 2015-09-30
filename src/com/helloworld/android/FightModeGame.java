@@ -885,6 +885,7 @@ public class FightModeGame extends Activity {
 
 		displayList.add(result);
 		mAdapter.notifyDataSetChanged();
+		resultList.setSelection(resultList.getAdapter().getCount()-1);
 
 		// limit the size of ListView be 5
 		/*
