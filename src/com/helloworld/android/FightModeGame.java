@@ -230,6 +230,15 @@ public class FightModeGame extends Activity {
 		initialGame();
 	}
 
+	@Override
+	public void onBackPressed(){
+
+		Log.d(TAG, "jasper on back button pressed");
+
+		// check if user really want to quit
+		showCheckQuitDialog();
+	}
+
 	// get layout
 	private void setMyView(){
 	
@@ -742,6 +751,13 @@ public class FightModeGame extends Activity {
 		dialog.setCanceledOnTouchOutside(false);
 	}
 
+	private void showCheckQuitDialog(){
+
+		Dialog dialog = getCheckQuitDialog();
+		dialog.show();
+		dialog.setCanceledOnTouchOutside(false);
+	}
+
 	// the dialog to inform user there is no network connection
 	private AlertDialog getAlertDialog(final String title, final String msg){
 		
@@ -749,7 +765,7 @@ public class FightModeGame extends Activity {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(title)
 				.setMessage(msg)
-				.setPositiveButton(R.string.signin, new DialogInterface.OnClickListener(){
+				.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener(){
 
 					@Override
 					public void onClick(DialogInterface dialog, int id){
@@ -790,7 +806,7 @@ public class FightModeGame extends Activity {
 		show_userID.setText("Your ID is " + myID);
 
 		builder.setView(v)
-			   .setPositiveButton(R.string.signin, new DialogInterface.OnClickListener() {
+			   .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
 			       
 					@Override
 				   	public void onClick(DialogInterface dialog, int id){
@@ -803,6 +819,26 @@ public class FightModeGame extends Activity {
 				   	}
 			   });
 
+		return builder.create();
+	}
+
+	private Dialog getCheckQuitDialog(){
+
+		Log.d(TAG, "jasper getCheckQuitDialog");
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle("Quit")
+			   .setMessage("Do you want to quit the game ?")
+			   .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener(){
+
+					public void onClick(DialogInterface dialog, int id) {
+						finish();
+					}
+			   })
+			   .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener(){
+
+					public void onClick(DialogInterface dialog, int id){
+					}
+			   });
 		return builder.create();
 	}
 

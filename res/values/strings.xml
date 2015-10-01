@@ -8,7 +8,8 @@
 	<!-- fight mode -->
 	<string name="ParingMsg">Please input rival\'s pin code</string>
 	<string name="Hint">1234</string>
-	<string name="signin">OK</string>
+	<string name="ok">OK</string>
+	<string name="cancel">Cancel</string>
 	<string name="hello">Jasper hello</string>
     <string name="app_name">NumberGame</string>
 	<string name="Go">GO</string>
