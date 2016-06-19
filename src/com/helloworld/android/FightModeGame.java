@@ -90,7 +90,7 @@ public class FightModeGame extends Activity {
 	private ArrayList<String> displayList;
 	private ResultAdapter mAdapter;
 
-	private final String server_domin = "http://61.228.180.251:3000/";
+	private final String server_domin = "https://floating-springs-86537.herokuapp.com/";
 	private final String register_userID_URL = server_domin + "registerUserId";
 	private final String check_fetched_URL = server_domin + "checkPairState";
 	private final String check_table_URL = server_domin + "checkTable";
