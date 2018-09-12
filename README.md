@@ -2,8 +2,9 @@
 
 This is a AB Number Guessing Game AKA well known [Bulls and Cows](https://en.wikipedia.org/wiki/Bulls_and_Cows).
 An Old, simple but fun game. <br>
-You can fight with your friend to see who can guess the number first! <br>
-Hope you enjoy the game !<br>
+You can fight with your friend to see who can guess the number first! Hope you enjoy the game !<br>
+This repository is for client side on Android phone. You can [check server side](https://github.com/JasperHsieh/NumberGameServer)<br>
+
 
 <img width="384" height="512" src="./screenShots/Screenshot_20161112-063420.jpg">
 
